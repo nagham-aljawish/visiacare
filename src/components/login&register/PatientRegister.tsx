@@ -1,12 +1,19 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
 import EyeLogo from "/src/assets/eye-svgrepo-com.svg";
+import { Eye, EyeOff } from "lucide-react";
 
 const PatientRegister: React.FC = () => {
-  const [fullName, setFullName] = useState("");
-  const [nationalId, setNationalId] = useState("");
-  const [phone, setPhone] = useState("");
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [national_number, setNationalNumber] = useState("");
+  const [phone_number, setPhoneNumber] = useState("");
+  const [gender, setGender] = useState("");
+  const [location, setLocation] = useState("");
+  const [chronic_conditions, setChronicConditions] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
@@ -15,24 +22,37 @@ const PatientRegister: React.FC = () => {
     setError("");
     setSuccess("");
 
-    if (!fullName || !nationalId || !phone || !password) {
-      setError("Please fill out all fields.");
+    if (
+      !name ||
+      !email ||
+      !national_number ||
+      !phone_number ||
+      !gender ||
+      !location ||
+      !password
+    ) {
+      setError("Please fill out all required fields.");
       return;
     }
 
     try {
-      // 📡 إرسال البيانات إلى الـ backend
-      const response = await fetch("https://your-backend.com/register", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          role: "patient", // 👈 الدور الخاص بالمريض
-          fullName,
-          nationalId,
-          phone,
-          password,
-        }),
-      });
+      const response = await fetch(
+        "http://127.0.0.1:8000/api/auth/register/patient",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            name,
+            email,
+            national_number,
+            phone_number,
+            gender,
+            location,
+            password,
+            chronic_conditions,
+          }),
+        }
+      );
 
       const data = await response.json();
 
@@ -42,9 +62,14 @@ const PatientRegister: React.FC = () => {
       }
 
       setSuccess("Patient account created successfully!");
-      setFullName("");
-      setNationalId("");
-      setPhone("");
+      // Clear inputs
+      setName("");
+      setEmail("");
+      setNationalNumber("");
+      setPhoneNumber("");
+      setGender("");
+      setLocation("");
+      setChronicConditions("");
       setPassword("");
     } catch (err) {
       console.error("Error:", err);
@@ -65,9 +90,8 @@ const PatientRegister: React.FC = () => {
         initial={{ opacity: 0, y: 35 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, ease: "easeOut" }}
-        className="relative z-10 w-[400px] bg-[#CCDCE9]/40 backdrop-blur-md p-8 rounded-2xl shadow-2xl border border-white/30"
+        className="relative z-10 w-[420px] bg-[#CCDCE9]/40 backdrop-blur-md p-8 rounded-2xl shadow-2xl border border-white/30"
       >
-        {/* ✅ الشعار */}
         <div className="text-center mb-8">
           <div className="flex justify-center items-center gap-2 mb-2">
             <img
@@ -84,44 +108,79 @@ const PatientRegister: React.FC = () => {
           <p className="text-[#1A2E44]/80 text-sm">Patient Registration Form</p>
         </div>
 
-        {/* ✅ نموذج التسجيل */}
         <form onSubmit={handleSubmit} className="flex flex-col space-y-3.5">
           <input
             type="text"
             placeholder="Full name"
-            value={fullName}
-            onChange={(e) => setFullName(e.target.value)}
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            className="w-full px-3 py-2.5 text-[14px] rounded-lg bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-300"
+          />
+          <input
+            type="email"
+            placeholder="Email address"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
             className="w-full px-3 py-2.5 text-[14px] rounded-lg bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-300"
           />
           <input
             type="text"
             placeholder="National ID"
-            value={nationalId}
-            onChange={(e) => setNationalId(e.target.value)}
+            value={national_number}
+            onChange={(e) => setNationalNumber(e.target.value)}
             className="w-full px-3 py-2.5 text-[14px] rounded-lg bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-300"
           />
           <input
             type="tel"
             placeholder="+963 xxx xxx xxx"
-            value={phone}
-            onChange={(e) => setPhone(e.target.value)}
+            value={phone_number}
+            onChange={(e) => setPhoneNumber(e.target.value)}
             className="w-full px-3 py-2.5 text-[14px] rounded-lg bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-300"
           />
+          <select
+            value={gender}
+            onChange={(e) => setGender(e.target.value)}
+            className="w-full px-3 py-2.5 text-[14px] rounded-lg bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-300"
+          >
+            <option value="">Select Gender</option>
+            <option value="male">Male</option>
+            <option value="female">Female</option>
+          </select>
           <input
-            type="password"
-            placeholder="********"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            type="text"
+            placeholder="Location"
+            value={location}
+            onChange={(e) => setLocation(e.target.value)}
             className="w-full px-3 py-2.5 text-[14px] rounded-lg bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-300"
           />
+          <textarea
+            placeholder="Chronic conditions (optional)"
+            value={chronic_conditions}
+            onChange={(e) => setChronicConditions(e.target.value)}
+            className="w-full px-3 py-2.5 text-[14px] rounded-lg bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-300 resize-none"
+          />
+          <div className="relative">
+            <input
+              type={showPassword ? "text" : "password"}
+              placeholder="Password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="w-full px-3 py-2.5 text-[14px] rounded-lg bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-300 pr-10"
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute right-3 top-2.5 text-gray-500 hover:text-[#1A2E44] transition"
+            >
+              {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+            </button>
+          </div>
 
-          {/* ✅ الرسائل */}
           {error && <p className="text-red-600 text-sm text-center">{error}</p>}
           {success && (
             <p className="text-green-700 text-sm text-center">{success}</p>
           )}
 
-          {/* ✅ زر التسجيل */}
           <motion.button
             whileHover={{ scale: 1.03 }}
             whileTap={{ scale: 0.97 }}
@@ -131,7 +190,6 @@ const PatientRegister: React.FC = () => {
             Sign Up
           </motion.button>
 
-          {/* ✅ رابط العودة */}
           <p className="text-center text-[#1A2E44]/80 text-sm mt-2">
             Already have an account?{" "}
             <a

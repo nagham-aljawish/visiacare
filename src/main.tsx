@@ -2,7 +2,6 @@ import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import "./index.css";
 
-// ✅ React Router
 import {
   BrowserRouter as Router,
   Routes,
@@ -10,17 +9,15 @@ import {
   Navigate,
 } from "react-router-dom";
 
-// ✅ Firebase
 import { initializeApp } from "firebase/app";
 
-// ✅ صفحات المشروع
-import App from "./App"; // صفحة تسجيل الدخول العامة (Login)
+import App from "./App";
 
-import AdminDashboard from "./AdminDashboard";
+import AdminDashboard from "./components/admin/AdminDashboard";
 import ProtectedRoute from "./ProtectedRoute";
-import DoctorRegister from "./components/register/DoctorRegister";
-import OpticalStoreRegister from "./components/register/OpticalStoreRegister";
-import PatientRegister from "./components/register/PatientRegister";
+import DoctorRegister from "./components/login&register/DoctorRegister";
+import OpticalStoreRegister from "./components/login&register/OpticalStoreRegister";
+import PatientRegister from "./components/login&register/PatientRegister";
 // ✅ إعدادات Firebase
 const firebaseConfig = {
   apiKey: "AIzaSyBWUngYt84AdgAXiIoFrItYHgMowHczYWg",
@@ -38,16 +35,14 @@ createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <Router>
       <Routes>
-        {/* 
-         صفحة تسجيل الدخول الرئيسية */}
         <Route path="/" element={<App />} />
 
-        {/*  صفحة إنشاء الحساب */}
-        <Route path="/register" element={<DoctorRegister />} />
-        <Route path="/register" element={<OpticalStoreRegister />} />
-        <Route path="/register" element={<PatientRegister />} />
+        {/* صفحات التسجيل */}
+        <Route path="/register/doctor" element={<DoctorRegister />} />
+        <Route path="/register/store" element={<OpticalStoreRegister />} />
+        <Route path="/register/patient" element={<PatientRegister />} />
 
-        {/*  لوحة تحكم الأدمن (محمية) */}
+        {/* لوحات التحكم */}
         <Route
           path="/admin"
           element={
@@ -57,7 +52,6 @@ createRoot(document.getElementById("root")!).render(
           }
         />
 
-        {/*  لوحة تحكم الطبيب (محمية) */}
         <Route
           path="/doctor-dashboard"
           element={
@@ -67,7 +61,6 @@ createRoot(document.getElementById("root")!).render(
           }
         />
 
-        {/* لوحة تحكم المتجر البصري (محمية) */}
         <Route
           path="/store-dashboard"
           element={
@@ -77,7 +70,6 @@ createRoot(document.getElementById("root")!).render(
           }
         />
 
-        {/*  لوحة تحكم المريض (محمية) */}
         <Route
           path="/patient-dashboard"
           element={
@@ -87,7 +79,6 @@ createRoot(document.getElementById("root")!).render(
           }
         />
 
-        {/*  أي مسار غير معروف */}
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </Router>
