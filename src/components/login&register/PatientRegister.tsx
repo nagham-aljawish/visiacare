@@ -16,11 +16,13 @@ const PatientRegister: React.FC = () => {
 
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
     setSuccess("");
+    setLoading(true);
 
     if (
       !name ||
@@ -32,6 +34,7 @@ const PatientRegister: React.FC = () => {
       !password
     ) {
       setError("Please fill out all required fields.");
+      setLoading(false);
       return;
     }
 
@@ -55,14 +58,17 @@ const PatientRegister: React.FC = () => {
       );
 
       const data = await response.json();
+      setLoading(false);
 
       if (!response.ok) {
         setError(data.message || "Something went wrong. Try again.");
         return;
       }
 
-      setSuccess("Patient account created successfully!");
-      // Clear inputs
+      setSuccess(
+        "Your registration request has been sent successfully. Please wait for admin approval before logging in."
+      );
+
       setName("");
       setEmail("");
       setNationalNumber("");
@@ -74,6 +80,7 @@ const PatientRegister: React.FC = () => {
     } catch (err) {
       console.error("Error:", err);
       setError("Server connection failed. Please try again.");
+      setLoading(false);
     }
   };
 
@@ -92,6 +99,7 @@ const PatientRegister: React.FC = () => {
         transition={{ duration: 0.6, ease: "easeOut" }}
         className="relative z-10 w-[420px] bg-[#CCDCE9]/40 backdrop-blur-md p-8 rounded-2xl shadow-2xl border border-white/30"
       >
+        {/* Header */}
         <div className="text-center mb-8">
           <div className="flex justify-center items-center gap-2 mb-2">
             <img
@@ -108,6 +116,7 @@ const PatientRegister: React.FC = () => {
           <p className="text-[#1A2E44]/80 text-sm">Patient Registration Form</p>
         </div>
 
+        {/* Form */}
         <form onSubmit={handleSubmit} className="flex flex-col space-y-3.5">
           <input
             type="text"
@@ -116,6 +125,7 @@ const PatientRegister: React.FC = () => {
             onChange={(e) => setName(e.target.value)}
             className="w-full px-3 py-2.5 text-[14px] rounded-lg bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-300"
           />
+
           <input
             type="email"
             placeholder="Email address"
@@ -123,6 +133,7 @@ const PatientRegister: React.FC = () => {
             onChange={(e) => setEmail(e.target.value)}
             className="w-full px-3 py-2.5 text-[14px] rounded-lg bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-300"
           />
+
           <input
             type="text"
             placeholder="National ID"
@@ -130,6 +141,7 @@ const PatientRegister: React.FC = () => {
             onChange={(e) => setNationalNumber(e.target.value)}
             className="w-full px-3 py-2.5 text-[14px] rounded-lg bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-300"
           />
+
           <input
             type="tel"
             placeholder="+963 xxx xxx xxx"
@@ -137,6 +149,7 @@ const PatientRegister: React.FC = () => {
             onChange={(e) => setPhoneNumber(e.target.value)}
             className="w-full px-3 py-2.5 text-[14px] rounded-lg bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-300"
           />
+
           <select
             value={gender}
             onChange={(e) => setGender(e.target.value)}
@@ -146,6 +159,7 @@ const PatientRegister: React.FC = () => {
             <option value="male">Male</option>
             <option value="female">Female</option>
           </select>
+
           <input
             type="text"
             placeholder="Location"
@@ -153,19 +167,22 @@ const PatientRegister: React.FC = () => {
             onChange={(e) => setLocation(e.target.value)}
             className="w-full px-3 py-2.5 text-[14px] rounded-lg bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-300"
           />
+
           <textarea
             placeholder="Chronic conditions (optional)"
             value={chronic_conditions}
             onChange={(e) => setChronicConditions(e.target.value)}
             className="w-full px-3 py-2.5 text-[14px] rounded-lg bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-300 resize-none"
           />
+
+          {/* Password with Eye */}
           <div className="relative">
             <input
               type={showPassword ? "text" : "password"}
               placeholder="Password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-3 py-2.5 text-[14px] rounded-lg bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-300 pr-10"
+              className="w-full px-3 py-2.5 pr-10 text-[14px] rounded-lg bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-300"
             />
             <button
               type="button"
@@ -182,12 +199,17 @@ const PatientRegister: React.FC = () => {
           )}
 
           <motion.button
-            whileHover={{ scale: 1.03 }}
-            whileTap={{ scale: 0.97 }}
+            whileHover={!loading ? { scale: 1.03 } : {}}
+            whileTap={!loading ? { scale: 0.97 } : {}}
             type="submit"
-            className="w-full bg-[#1A2E44] text-white text-[14px] py-2.5 rounded-full font-medium hover:bg-[#16283b] transition"
+            disabled={loading}
+            className={`w-full text-white text-[14px] py-2.5 rounded-full font-medium transition ${
+              loading
+                ? "bg-[#1A2E44]/60 cursor-not-allowed"
+                : "bg-[#1A2E44] hover:bg-[#16283b]"
+            }`}
           >
-            Sign Up
+            {loading ? "Submitting..." : "Sign Up"}
           </motion.button>
 
           <p className="text-center text-[#1A2E44]/80 text-sm mt-2">
