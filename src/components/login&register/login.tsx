@@ -28,10 +28,10 @@ const Login: React.FC = () => {
   const login = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
+    setLoading(true);
 
     if (!validateInputs()) return;
 
-    setLoading(true);
     try {
       const response = await fetch("http://127.0.0.1:8000/api/auth/login", {
         method: "POST",
@@ -43,15 +43,14 @@ const Login: React.FC = () => {
       setLoading(false);
 
       if (!response.ok) {
-        setError(data.message || "Invalid credentials.");
+        setError(data.message || "Login failed. Please try again.");
         return;
       }
 
-      // Save token + role
+      //save token and role after approval
       localStorage.setItem("token", data.token);
       localStorage.setItem("role", data.role);
 
-      // Redirect based on role
       switch (data.role) {
         case "admin":
           navigate("/admin");
@@ -127,7 +126,7 @@ const Login: React.FC = () => {
             <div className="relative">
               <input
                 type={showPassword ? "text" : "password"}
-                placeholder="********"
+                placeholder="Password"
                 className="w-full px-5 py-3 text-[15px] rounded-lg bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-300"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
