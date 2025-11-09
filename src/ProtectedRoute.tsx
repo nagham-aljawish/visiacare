@@ -10,18 +10,20 @@ const ProtectedRoute = ({ children, allowedRoles }: ProtectedRouteProps) => {
   const token = localStorage.getItem("token");
   const role = localStorage.getItem("role");
 
-  //  إذا ما في token → رجّع المستخدم لتسجيل الدخول
+  // إذا لم يكن المستخدم مسجّل دخول
   if (!token) {
+    console.warn("User not authenticated. Redirecting to login.");
     return <Navigate to="/" replace />;
   }
 
-  //  تحقق إذا كان الدور من ضمن الأدوار المسموح بها
-  if (!role || !allowedRoles.includes(role)) {
-    // مثلاً إذا طبيب حاول يدخل صفحة الأدمن
+  // إذا كان الدور غير مسموح (غير حساس لحالة الأحرف)
+  const normalizedRole = role?.toLowerCase();
+  const normalizedAllowedRoles = allowedRoles.map((r) => r.toLowerCase());
+
+  if (!normalizedRole || !normalizedAllowedRoles.includes(normalizedRole)) {
+    console.warn(`User role "${role}" not allowed. Redirecting to login.`);
     return <Navigate to="/" replace />;
   }
-
-  //  إذا كل شيء تمام → عرض الصفحة المحمية
   return children;
 };
 

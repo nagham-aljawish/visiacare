@@ -47,11 +47,16 @@ const Login: React.FC = () => {
         return;
       }
 
-      //save token and role after approval
+      console.log("Login response:", data);
+      console.log("Token:", data.token);
+      console.log("Role:", data.role);
+
       localStorage.setItem("token", data.token);
       localStorage.setItem("role", data.role);
 
-      switch (data.role) {
+      const role = data.role.toLowerCase();
+
+      switch (role) {
         case "admin":
           navigate("/admin");
           break;
