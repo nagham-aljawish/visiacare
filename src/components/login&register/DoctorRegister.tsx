@@ -8,7 +8,7 @@ const DoctorRegister: React.FC = () => {
   const [email, setEmail] = useState("");
   const [phone_number, setPhoneNumber] = useState("");
   const [password, setPassword] = useState("");
-  const [showPassword, setShowPassword] = useState(false); // 👁️
+  const [showPassword, setShowPassword] = useState(false);
   const [gender, setGender] = useState("");
   const [license, setLicense] = useState("");
   const [location, setLocation] = useState("");
@@ -17,11 +17,13 @@ const DoctorRegister: React.FC = () => {
 
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
     setSuccess("");
+    setLoading(true);
 
     if (
       !name ||
@@ -34,6 +36,7 @@ const DoctorRegister: React.FC = () => {
       !shift
     ) {
       setError("Please fill out all required fields.");
+      setLoading(false);
       return;
     }
 
@@ -58,13 +61,18 @@ const DoctorRegister: React.FC = () => {
       );
 
       const data = await response.json();
+      setLoading(false);
 
       if (!response.ok) {
         setError(data.message || "Something went wrong. Try again.");
         return;
       }
 
-      setSuccess("Doctor account created successfully!");
+      setSuccess(
+        "Your registration request has been sent successfully. Please wait for admin approval before logging in."
+      );
+
+      // Clear inputs
       setName("");
       setEmail("");
       setPhoneNumber("");
@@ -77,6 +85,7 @@ const DoctorRegister: React.FC = () => {
     } catch (err) {
       console.error("Error:", err);
       setError("Server connection failed. Please try again.");
+      setLoading(false);
     }
   };
 
@@ -156,7 +165,6 @@ const DoctorRegister: React.FC = () => {
             </button>
           </div>
 
-          {/* ✅ gender */}
           <select
             value={gender}
             onChange={(e) => setGender(e.target.value)}
@@ -167,7 +175,6 @@ const DoctorRegister: React.FC = () => {
             <option value="female">Female</option>
           </select>
 
-          {/* ✅ license (string) */}
           <input
             type="text"
             placeholder="License number"
@@ -176,7 +183,6 @@ const DoctorRegister: React.FC = () => {
             className="w-full px-3 py-2.5 text-[14px] rounded-lg bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-300"
           />
 
-          {/* ✅ location */}
           <input
             type="text"
             placeholder="Clinic location"
@@ -185,7 +191,6 @@ const DoctorRegister: React.FC = () => {
             className="w-full px-3 py-2.5 text-[14px] rounded-lg bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-300"
           />
 
-          {/* ✅ shift (date type) */}
           <div>
             <label className="block text-[#1A2E44] mb-1 text-sm font-medium">
               Work Shift Date
@@ -198,7 +203,6 @@ const DoctorRegister: React.FC = () => {
             />
           </div>
 
-          {/* ✅ bio */}
           <textarea
             placeholder="Short bio (optional)"
             value={bio}
@@ -213,12 +217,17 @@ const DoctorRegister: React.FC = () => {
           )}
 
           <motion.button
-            whileHover={{ scale: 1.03 }}
-            whileTap={{ scale: 0.97 }}
+            whileHover={!loading ? { scale: 1.03 } : {}}
+            whileTap={!loading ? { scale: 0.97 } : {}}
             type="submit"
-            className="w-full bg-[#1A2E44] text-white text-[14px] py-2.5 rounded-full font-medium hover:bg-[#16283b] transition"
+            disabled={loading}
+            className={`w-full text-white text-[14px] py-2.5 rounded-full font-medium transition ${
+              loading
+                ? "bg-[#1A2E44]/60 cursor-not-allowed"
+                : "bg-[#1A2E44] hover:bg-[#16283b]"
+            }`}
           >
-            Sign Up
+            {loading ? "Submitting..." : "Sign Up"}
           </motion.button>
 
           <p className="text-center text-[#1A2E44]/80 text-sm mt-2">
