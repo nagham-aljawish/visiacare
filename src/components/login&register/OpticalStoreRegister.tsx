@@ -3,42 +3,27 @@ import { motion } from "framer-motion";
 import { Eye, EyeOff } from "lucide-react";
 import EyeLogo from "/src/assets/eye-svgrepo-com.svg";
 
-interface ServerResponse {
-  message?: string;
-  errors?: { [key: string]: string[] };
-  [key: string]: unknown;
-}
-
 const OpticalStoreRegister: React.FC = () => {
   const [storeName, setStoreName] = useState("");
-  const [name, setName] = useState(""); // حقل الاسم
-  const [gender, setGender] = useState(""); // حقل الجنس
+  const [name, setName] = useState("");
+  const [gender, setGender] = useState("");
   const [email, setEmail] = useState("");
   const [phone_number, setPhoneNumber] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [location, setLocation] = useState("");
   const [description, setDescription] = useState("");
-  const [shift, setShift] = useState(""); // YYYY-MM-DD
+  const [shift, setShift] = useState(""); // date
 
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
-
-  // ✅ دالة لتحويل تاريخ YYYY-MM-DD إلى صيغة انجليزية
-  const formatDateEnglish = (dateStr: string) => {
-    if (!dateStr) return "";
-    const date = new Date(dateStr);
-    return date.toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-    });
-  };
+  const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
     setSuccess("");
+    setLoading(true);
 
     if (
       !storeName ||
@@ -49,6 +34,7 @@ const OpticalStoreRegister: React.FC = () => {
       !password
     ) {
       setError("Please fill out all required fields.");
+      setLoading(false);
       return;
     }
 
@@ -65,38 +51,23 @@ const OpticalStoreRegister: React.FC = () => {
             email,
             phone_number,
             password,
-            location: location || null,
-            description: description || null,
-            shift: shift || null,
+            location,
+            description,
+            shift,
           }),
         }
       );
 
-      const text = await response.text();
-      console.log("Server response text:", text);
-
-      let data: ServerResponse | null = null;
-      try {
-        data = JSON.parse(text) as ServerResponse;
-      } catch {
-        console.warn("Response is not JSON, using raw text");
-      }
+      const data = await response.json();
+      setLoading(false);
 
       if (!response.ok) {
-        if (data?.errors) {
-          const messages = Object.values(data.errors).flat().join(" ");
-          setError(messages || "Validation failed.");
-        } else {
-          setError(data?.message || text || "Something went wrong. Try again.");
-        }
+        setError(data.message || "Something went wrong. Try again.");
         return;
       }
 
-      // ✅ رسالة نجاح للمستخدم + طباعة تاريخ shift بالإنجليزي
       setSuccess(
-        `${data?.message || "Optical store account created successfully!"} ${
-          shift ? `Shift: ${formatDateEnglish(shift)}` : ""
-        }`
+        "Your registration request has been sent successfully. Please wait for admin approval before logging in."
       );
 
       setStoreName("");
@@ -111,13 +82,16 @@ const OpticalStoreRegister: React.FC = () => {
     } catch (err) {
       console.error("Error:", err);
       setError("Server connection failed. Please try again.");
+      setLoading(false);
     }
   };
 
   return (
     <div
       className="min-h-screen flex items-center justify-center bg-cover bg-center relative"
-      style={{ backgroundImage: "url('/images/IMG_9406.JPG')" }}
+      style={{
+        backgroundImage: "url('/images/IMG_9406.JPG')",
+      }}
     >
       <div className="absolute inset-0 bg-black/40" />
 
@@ -170,7 +144,6 @@ const OpticalStoreRegister: React.FC = () => {
             <option value="">Select Gender</option>
             <option value="male">Male</option>
             <option value="female">Female</option>
-            <option value="other">Other</option>
           </select>
 
           <input
@@ -189,13 +162,14 @@ const OpticalStoreRegister: React.FC = () => {
             className="w-full px-3 py-2.5 text-[14px] rounded-lg bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-300"
           />
 
+          {/* Password with Eye icon */}
           <div className="relative">
             <input
               type={showPassword ? "text" : "password"}
               placeholder="Password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-3 py-2.5 text-[14px] rounded-lg bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-300 pr-10"
+              className="w-full px-3 py-2.5 pr-10 text-[14px] rounded-lg bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-300"
             />
             <button
               type="button"
@@ -214,12 +188,17 @@ const OpticalStoreRegister: React.FC = () => {
             className="w-full px-3 py-2.5 text-[14px] rounded-lg bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-300"
           />
 
-          <input
-            type="date"
-            value={shift}
-            onChange={(e) => setShift(e.target.value)}
-            className="w-full px-3 py-2.5 text-[14px] rounded-lg bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-300"
-          />
+          <div>
+            <label className="block text-[#1A2E44] mb-1 text-sm font-medium">
+              Work Shift Date
+            </label>
+            <input
+              type="date"
+              value={shift}
+              onChange={(e) => setShift(e.target.value)}
+              className="w-full px-3 py-2.5 text-[14px] rounded-lg bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-300"
+            />
+          </div>
 
           <textarea
             placeholder="Description about the store (optional)"
@@ -235,12 +214,17 @@ const OpticalStoreRegister: React.FC = () => {
           )}
 
           <motion.button
-            whileHover={{ scale: 1.03 }}
-            whileTap={{ scale: 0.97 }}
+            whileHover={!loading ? { scale: 1.03 } : {}}
+            whileTap={!loading ? { scale: 0.97 } : {}}
             type="submit"
-            className="w-full bg-[#1A2E44] text-white text-[14px] py-2.5 rounded-full font-medium hover:bg-[#16283b] transition"
+            disabled={loading}
+            className={`w-full text-white text-[14px] py-2.5 rounded-full font-medium transition ${
+              loading
+                ? "bg-[#1A2E44]/60 cursor-not-allowed"
+                : "bg-[#1A2E44] hover:bg-[#16283b]"
+            }`}
           >
-            Sign Up
+            {loading ? "Submitting..." : "Sign Up"}
           </motion.button>
 
           <p className="text-center text-[#1A2E44]/80 text-sm mt-2">
