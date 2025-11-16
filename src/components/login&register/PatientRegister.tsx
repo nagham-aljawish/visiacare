@@ -65,8 +65,9 @@ const PatientRegister: React.FC = () => {
         return;
       }
 
+      // ✔️ مافي موافقة أدمن — الحساب جاهز فورًا
       setSuccess(
-        "Your registration request has been sent successfully. Please wait for admin approval before logging in."
+        "Your account has been created successfully! You can now log in."
       );
 
       setName("");
@@ -175,7 +176,7 @@ const PatientRegister: React.FC = () => {
             className="w-full px-3 py-2.5 text-[14px] rounded-lg bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-300 resize-none"
           />
 
-          {/* Password with Eye */}
+          {/* Password */}
           <div className="relative">
             <input
               type={showPassword ? "text" : "password"}
