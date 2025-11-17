@@ -1,58 +1,122 @@
 import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import {
-  CheckCircle,
-  XCircle,
-  Clock,
-  Eye,
-  Loader2,
-  Users,
-  Bell,
-  Stethoscope,
-  Briefcase,
-} from "lucide-react";
+import { Clock, Loader2, Bell, Stethoscope, Briefcase } from "lucide-react";
 import EyeLogo from "/src/assets/eye-svgrepo-com.svg";
 
-interface Request {
+interface Item {
   id: number;
   name: string;
-  role: "Doctor" | "Optical Store" | "Patient";
-  status: "approved" | "pending" | "rejected";
+  email: string;
+  status: "pending" | "approved" | "rejected";
+  type: "doctor" | "optical";
+  specialization?: string;
 }
 
+type Section = "dashboard" | "users" | "notifications";
+type FilterType = "all" | "pending" | "approved" | "rejected";
+
 const AdminDashboard: React.FC = () => {
-  const [activeSection, setActiveSection] = useState<
-    "dashboard" | "users" | "notifications"
-  >("dashboard");
-  const [filter, setFilter] = useState<
-    "all" | "approved" | "pending" | "rejected"
-  >("all");
-  const [requests, setRequests] = useState<Request[]>([]);
+  const [activeSection, setActiveSection] = useState<Section>("dashboard");
+
+  const [pendingDoctors, setPendingDoctors] = useState<Item[]>([]);
+  const [pendingOpticals, setPendingOpticals] = useState<Item[]>([]);
+  const [approvedDoctors, setApprovedDoctors] = useState<Item[]>([]);
+  const [approvedOpticals, setApprovedOpticals] = useState<Item[]>([]);
+  const [rejectedDoctors, setRejectedDoctors] = useState<Item[]>([]);
+  const [rejectedOpticals, setRejectedOpticals] = useState<Item[]>([]);
+
   const [loading, setLoading] = useState(true);
+  const token = localStorage.getItem("token");
 
   useEffect(() => {
-    setTimeout(() => {
-      setRequests([
-        { id: 1, name: "Dr. John Smith", role: "Doctor", status: "pending" },
-        {
-          id: 2,
-          name: "OptiView Store",
-          role: "Optical Store",
-          status: "approved",
-        },
-        { id: 3, name: "Emily Roberts", role: "Patient", status: "rejected" },
-      ]);
-      setLoading(false);
-    }, 1000);
-  }, []);
+    if (!token) return console.error("No admin token found");
 
-  const filteredRequests =
-    filter === "all" ? requests : requests.filter((r) => r.status === filter);
+    const loadAll = async () => {
+      setLoading(true);
+      try {
+        const urls = [
+          "doctors/pending",
+          "opticals/pending",
+          "doctors/approved",
+          "opticals/approved",
+          "doctors/rejected",
+          "opticals/rejected",
+        ].map((path) => `http://127.0.0.1:8000/api/admin/${path}`);
 
-  const updateStatus = (id: number, newStatus: "approved" | "rejected") => {
-    setRequests((prev) =>
-      prev.map((req) => (req.id === id ? { ...req, status: newStatus } : req))
-    );
+        const responses = await Promise.all(
+          urls.map((url) =>
+            fetch(url, {
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`,
+              },
+            })
+          )
+        );
+
+        const data = await Promise.all(responses.map((res) => res.json()));
+
+        setPendingDoctors(data[0].data ?? []);
+        setPendingOpticals(data[1].data ?? []);
+        setApprovedDoctors(data[2].data ?? []);
+        setApprovedOpticals(data[3].data ?? []);
+        setRejectedDoctors(data[4].data ?? []);
+        setRejectedOpticals(data[5].data ?? []);
+      } catch (err) {
+        console.error("API Load Error:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadAll();
+  }, [token]);
+
+  // Approve user
+  // Approve user
+  const approve = (id: number, type: "doctor" | "optical") => {
+    if (type === "doctor") {
+      const user =
+        pendingDoctors.find((d) => d.id === id) ||
+        rejectedDoctors.find((d) => d.id === id);
+      if (!user) return;
+      // إزالة من القوائم السابقة
+      setPendingDoctors((prev) => prev.filter((d) => d.id !== id));
+      setRejectedDoctors((prev) => prev.filter((d) => d.id !== id));
+      // إضافته لقائمة approved
+      setApprovedDoctors((prev) => [...prev, { ...user, status: "approved" }]);
+    } else {
+      const user =
+        pendingOpticals.find((o) => o.id === id) ||
+        rejectedOpticals.find((o) => o.id === id);
+      if (!user) return;
+      setPendingOpticals((prev) => prev.filter((o) => o.id !== id));
+      setRejectedOpticals((prev) => prev.filter((o) => o.id !== id));
+      setApprovedOpticals((prev) => [...prev, { ...user, status: "approved" }]);
+    }
+  };
+
+  // Reject user
+  const reject = (id: number, type: "doctor" | "optical") => {
+    if (type === "doctor") {
+      const user =
+        pendingDoctors.find((d) => d.id === id) ||
+        approvedDoctors.find((d) => d.id === id);
+      if (!user) return;
+      // إزالة من القوائم السابقة
+      setPendingDoctors((prev) => prev.filter((d) => d.id !== id));
+      setApprovedDoctors((prev) => prev.filter((d) => d.id !== id));
+      // إضافته لقائمة rejected
+      setRejectedDoctors((prev) => [...prev, { ...user, status: "rejected" }]);
+    } else {
+      const user =
+        pendingOpticals.find((o) => o.id === id) ||
+        approvedOpticals.find((o) => o.id === id);
+      if (!user) return;
+      setPendingOpticals((prev) => prev.filter((o) => o.id !== id));
+      setApprovedOpticals((prev) => prev.filter((o) => o.id !== id));
+      setRejectedOpticals((prev) => [...prev, { ...user, status: "rejected" }]);
+    }
   };
 
   return (
@@ -64,236 +128,72 @@ const AdminDashboard: React.FC = () => {
           <h2 className="text-2xl font-semibold">VisaCare</h2>
         </div>
         <nav className="flex flex-col space-y-2">
-          <button
-            className={`text-left px-4 py-2 rounded-lg w-full text-left ${
-              activeSection === "dashboard"
-                ? "bg-white/20 font-medium"
-                : "hover:bg-white/10"
-            }`}
+          <SidebarBtn
+            active={activeSection === "dashboard"}
+            label="Dashboard"
             onClick={() => setActiveSection("dashboard")}
-          >
-            Dashboard
-          </button>
-          <button
-            className={`text-left px-4 py-2 rounded-lg w-full text-left ${
-              activeSection === "users"
-                ? "bg-white/20 font-medium"
-                : "hover:bg-white/10"
-            }`}
+          />
+          <SidebarBtn
+            active={activeSection === "users"}
+            label="Users"
             onClick={() => setActiveSection("users")}
-          >
-            Users
-          </button>
-          <button
-            className={`text-left px-4 py-2 rounded-lg w-full text-left ${
-              activeSection === "notifications"
-                ? "bg-white/20 font-medium"
-                : "hover:bg-white/10"
-            }`}
+          />
+          <SidebarBtn
+            active={activeSection === "notifications"}
+            label="Notifications"
             onClick={() => setActiveSection("notifications")}
-          >
-            Notifications
-          </button>
+          />
           <hr className="border-white/20 my-4" />
-          <button className="text-left px-4 py-2 rounded-lg bg-[#1A2E44] hover:bg-red-700 w-full text-left">
+          <button className="text-left px-4 py-2 rounded-lg bg-red-600 hover:bg-red-700 w-full">
             Logout
           </button>
         </nav>
       </aside>
 
-      {/* Main Section */}
-      <main className="flex-1 min-h-screen p-4 sm:p-10 overflow-auto bg-[#A8CFEB]">
+      {/* Main */}
+      <main className="flex-1 min-h-screen p-4 sm:p-10 overflow-y-auto bg-[#A8CFEB]">
         {activeSection === "dashboard" && (
           <>
-            <h1 className="text-2xl sm:text-3xl font-bold mb-6 text-[#0D1B2A]">
-              Admin Dashboard
-            </h1>
-
-            {/* Dashboard Cards */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
-              {[
-                {
-                  title: "Doctors",
-                  icon: <Stethoscope size={24} />,
-                  value: 24,
-                  color: "bg-[#CCDCE9]",
-                },
-                {
-                  title: "Patients",
-                  icon: <Users size={24} />,
-                  value: 52,
-                  color: "bg-[#CCDCE9]",
-                },
-                {
-                  title: "Optical Stores",
-                  icon: <Briefcase size={24} />,
-                  value: 12,
-                  color: "bg-[#CCDCE9]",
-                },
-                {
-                  title: "Pending Requests",
-                  icon: <Clock size={24} />,
-                  value: 5,
-                  color: "bg-[#CCDCE9]",
-                },
-                {
-                  title: "Notifications",
-                  icon: <Bell size={24} />,
-                  value: 3,
-                  color: "bg-[#CCDCE9]",
-                },
-              ].map((card, idx) => (
-                <motion.div
-                  key={idx}
-                  whileHover={{ scale: 1.05 }}
-                  className={`shadow-lg rounded-xl p-6 text-center ${card.color}`}
-                >
-                  <div className="flex justify-center mb-2">{card.icon}</div>
-                  <p className="text-[#1A2E44]/70 text-sm">{card.title}</p>
-                  <h2 className="text-2xl sm:text-3xl font-bold text-[#1A2E44] mt-1">
-                    {card.value}
-                  </h2>
-                </motion.div>
-              ))}
-            </div>
-
-            {/* Filter Buttons */}
-            <div className="flex flex-wrap gap-2 mb-6">
-              {[
-                { key: "all", label: "All", icon: null },
-                {
-                  key: "approved",
-                  label: "Approved",
-                  icon: <CheckCircle size={16} />,
-                },
-                { key: "pending", label: "Pending", icon: <Clock size={16} /> },
-                {
-                  key: "rejected",
-                  label: "Rejected",
-                  icon: <XCircle size={16} />,
-                },
-              ].map(({ key, label, icon }) => (
-                <button
-                  key={key}
-                  onClick={() => setFilter(key as never)}
-                  className={`px-3 py-1.5 rounded-full flex items-center gap-1 font-medium shadow-sm transition ${
-                    filter === key
-                      ? key === "approved"
-                        ? "bg-green-600 text-white"
-                        : key === "pending"
-                        ? "bg-yellow-500 text-white"
-                        : key === "rejected"
-                        ? "bg-red-600 text-white"
-                        : "bg-[#1A2E44] text-white"
-                      : "bg-white text-[#1A2E44] hover:bg-[#DDE9F7]"
-                  }`}
-                >
-                  {icon} {label}
-                </button>
-              ))}
-            </div>
-
-            {/* Requests Table */}
-            {loading ? (
-              <div className="flex justify-center items-center h-40 text-[#1A2E44]">
-                <Loader2 size={28} className="animate-spin mr-2" />
-                Loading requests...
-              </div>
-            ) : (
-              <motion.div
-                className="bg-[#CCDCE9] rounded-2xl shadow-xl p-4 sm:p-6 overflow-auto"
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.3 }}
-              >
-                <h2 className="text-xl font-semibold mb-4 text-[#1A2E44]">
-                  Registration Requests ({filteredRequests.length})
-                </h2>
-
-                {filteredRequests.length === 0 ? (
-                  <p className="text-gray-500 text-center py-6 break-words">
-                    No requests found for this filter.
-                  </p>
-                ) : (
-                  <table className="w-full border-collapse table-auto">
-                    <thead>
-                      <tr className="bg-[#EAF2FA] text-left">
-                        <th className="p-2 font-semibold">Name</th>
-                        <th className="p-2 font-semibold">Type</th>
-                        <th className="p-2 font-semibold">Status</th>
-                        <th className="p-2 text-center font-semibold">
-                          Action
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {filteredRequests.map((req) => (
-                        <tr
-                          key={req.id}
-                          className="border-b hover:bg-[#F7FAFD] transition"
-                        >
-                          <td className="p-2 font-medium break-words">
-                            {req.name}
-                          </td>
-                          <td className="p-2">{req.role}</td>
-                          <td
-                            className={`p-2 font-semibold capitalize ${
-                              req.status === "approved"
-                                ? "text-green-600"
-                                : req.status === "pending"
-                                ? "text-yellow-600"
-                                : "text-red-600"
-                            }`}
-                          >
-                            {req.status}
-                          </td>
-                          <td className="p-2 flex justify-center items-center gap-2 flex-wrap">
-                            {req.status === "pending" ? (
-                              <>
-                                <button
-                                  onClick={() =>
-                                    updateStatus(req.id, "approved")
-                                  }
-                                  className="bg-green-600 text-white px-3 py-1 rounded-full text-sm hover:bg-green-700 transition"
-                                >
-                                  Approve
-                                </button>
-                                <button
-                                  onClick={() =>
-                                    updateStatus(req.id, "rejected")
-                                  }
-                                  className="bg-red-600 text-white px-3 py-1 rounded-full text-sm hover:bg-red-700 transition"
-                                >
-                                  Reject
-                                </button>
-                              </>
-                            ) : (
-                              <button className="bg-[#1A2E44] text-white px-3 py-1 rounded-full text-sm flex items-center gap-1 hover:bg-[#16283b] transition">
-                                <Eye size={14} /> View
-                              </button>
-                            )}
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                )}
-              </motion.div>
-            )}
+            <DashboardCards
+              doctors={
+                approvedDoctors.length +
+                pendingDoctors.length +
+                rejectedDoctors.length
+              }
+              stores={
+                approvedOpticals.length +
+                pendingOpticals.length +
+                rejectedOpticals.length
+              }
+              pending={pendingDoctors.length + pendingOpticals.length}
+              notifications={0}
+            />
+            <PendingRequestsTable
+              users={[...pendingDoctors, ...pendingOpticals]}
+              approve={approve}
+              reject={reject}
+            />
           </>
         )}
 
         {activeSection === "users" && (
-          <div>
-            <h1 className="text-2xl font-bold mb-4">Users Section</h1>
-            <p>Here you can see and manage all users.</p>
-          </div>
+          <UsersSection
+            loading={loading}
+            pendingDoctors={pendingDoctors}
+            pendingOpticals={pendingOpticals}
+            approvedDoctors={approvedDoctors}
+            approvedOpticals={approvedOpticals}
+            rejectedDoctors={rejectedDoctors}
+            rejectedOpticals={rejectedOpticals}
+            approve={approve}
+            reject={reject}
+          />
         )}
 
         {activeSection === "notifications" && (
           <div>
-            <h1 className="text-2xl font-bold mb-4">Notifications Section</h1>
-            <p>Here you can see all notifications.</p>
+            <h1 className="text-3xl font-bold mb-4">Notifications</h1>
+            <p>No notifications yet.</p>
           </div>
         )}
       </main>
@@ -302,3 +202,205 @@ const AdminDashboard: React.FC = () => {
 };
 
 export default AdminDashboard;
+
+/* =========================
+   Components
+========================= */
+const SidebarBtn = ({
+  active,
+  label,
+  onClick,
+}: {
+  active: boolean;
+  label: string;
+  onClick: () => void;
+}) => (
+  <button
+    onClick={onClick}
+    className={`px-4 py-2 rounded-lg text-left ${
+      active ? "bg-white/20 font-medium" : "hover:bg-white/10"
+    }`}
+  >
+    {label}
+  </button>
+);
+
+const DashboardCards = ({
+  doctors,
+  stores,
+  pending,
+  notifications,
+}: {
+  doctors: number;
+  stores: number;
+  pending: number;
+  notifications: number;
+}) => (
+  <>
+    <h1 className="text-3xl font-bold mb-6 text-[#0D1B2A]">Admin Dashboard</h1>
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
+      <StatCard title="Doctors" value={doctors} icon={<Stethoscope />} />
+      <StatCard title="Optical Stores" value={stores} icon={<Briefcase />} />
+      <StatCard title="Pending Requests" value={pending} icon={<Clock />} />
+      <StatCard title="Notifications" value={notifications} icon={<Bell />} />
+    </div>
+  </>
+);
+
+const StatCard = ({
+  title,
+  value,
+  icon,
+}: {
+  title: string;
+  value: number;
+  icon: React.ReactNode;
+}) => (
+  <motion.div
+    whileHover={{ scale: 1.03 }}
+    className="shadow-lg rounded-xl p-6 text-center bg-[#CCDCE9]"
+  >
+    <div className="flex justify-center mb-2 text-[#1A2E44]">{icon}</div>
+    <p className="text-[#1A2E44]/70 text-sm">{title}</p>
+    <h2 className="text-2xl font-bold text-[#1A2E44] mt-1">{value}</h2>
+  </motion.div>
+);
+
+/* =========================
+   Pending Requests Table
+========================= */
+const PendingRequestsTable = ({
+  users,
+  approve,
+  reject,
+}: {
+  users: Item[];
+  approve: (id: number, type: "doctor" | "optical") => void;
+  reject: (id: number, type: "doctor" | "optical") => void;
+}) => {
+  if (users.length === 0)
+    return <p className="text-gray-500 text-center py-10">No users found.</p>;
+
+  return (
+    <motion.div
+      className="bg-[#CCDCE9] rounded-2xl shadow-xl p-6 mt-8"
+      initial={{ opacity: 0, y: 15 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4 }}
+    >
+      <h2 className="text-xl font-semibold mb-4 text-[#1A2E44]">Users</h2>
+      <table className="w-full border-collapse">
+        <thead>
+          <tr className="bg-[#EAF2FA] text-left">
+            <th className="p-3">Name</th>
+            <th className="p-3">Email</th>
+            <th className="p-3">Type</th>
+            <th className="p-3 text-center">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {users.map((u) => (
+            <tr key={u.id} className="border-b hover:bg-[#F9FBFD] transition">
+              <td className="p-3 font-medium">{u.name}</td>
+              <td className="p-3 font-medium">{u.email}</td>
+              <td className="p-3">
+                {u.type === "doctor" ? "Doctor" : "Optical Store"}
+              </td>
+              <td className="p-3 flex justify-center items-center gap-2 flex-wrap">
+                {u.status !== "approved" && (
+                  <button
+                    onClick={() => approve(u.id, u.type)}
+                    className="bg-green-600 text-white px-4 py-1.5 rounded-full text-sm hover:bg-green-700 transition"
+                  >
+                    Approve
+                  </button>
+                )}
+                {u.status !== "rejected" && (
+                  <button
+                    onClick={() => reject(u.id, u.type)}
+                    className="bg-red-600 text-white px-4 py-1.5 rounded-full text-sm hover:bg-red-700 transition"
+                  >
+                    Reject
+                  </button>
+                )}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </motion.div>
+  );
+};
+
+/* =========================
+   Users Section with Filter
+========================= */
+const UsersSection = ({
+  loading,
+  pendingDoctors,
+  pendingOpticals,
+  approvedDoctors,
+  approvedOpticals,
+  rejectedDoctors,
+  rejectedOpticals,
+  approve,
+  reject,
+}: {
+  loading: boolean;
+  pendingDoctors: Item[];
+  pendingOpticals: Item[];
+  approvedDoctors: Item[];
+  approvedOpticals: Item[];
+  rejectedDoctors: Item[];
+  rejectedOpticals: Item[];
+  approve: (id: number, type: "doctor" | "optical") => void;
+  reject: (id: number, type: "doctor" | "optical") => void;
+}) => {
+  const [filter, setFilter] = useState<FilterType>("all");
+
+  if (loading)
+    return (
+      <div className="flex justify-center items-center h-40 text-[#1A2E44]">
+        <Loader2 className="animate-spin mr-2" />
+        Loading users...
+      </div>
+    );
+
+  const allUsers = [
+    ...pendingDoctors,
+    ...pendingOpticals,
+    ...approvedDoctors,
+    ...approvedOpticals,
+    ...rejectedDoctors,
+    ...rejectedOpticals,
+  ];
+
+  const filteredUsers =
+    filter === "all" ? allUsers : allUsers.filter((u) => u.status === filter);
+
+  return (
+    <div>
+      <h1 className="text-3xl font-bold mb-6">Users Management</h1>
+      <div className="mb-4 flex flex-wrap gap-2">
+        {(["all", "pending", "approved", "rejected"] as const).map((f) => (
+          <button
+            key={f}
+            className={`px-4 py-2 rounded-lg font-medium transition ${
+              filter === f
+                ? "bg-[#0D1B2A] text-white"
+                : "bg-white text-[#0D1B2A] hover:bg-[#EAF2FA]"
+            }`}
+            onClick={() => setFilter(f)}
+          >
+            {f.charAt(0).toUpperCase() + f.slice(1)}
+          </button>
+        ))}
+      </div>
+      <PendingRequestsTable
+        users={filteredUsers}
+        approve={approve}
+        reject={reject}
+      />
+    </div>
+  );
+};
