@@ -1,11 +1,22 @@
 import React from "react";
 import { Bell, MessageSquare } from "lucide-react";
+import { useNavigate, useLocation } from "react-router-dom";
 import EyeLogo from "/src/assets/eye-svgrepo-com.svg";
 
 const DoctorNavbar: React.FC = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  // دالة لمعرفة الزر النشط
+  const isActive = (path: string) => location.pathname === path;
+
   return (
     <nav className="w-full flex justify-between items-center px-8 py-4 bg-[#1A2E44] shadow-md fixed top-0 z-50">
-      <div className="flex items-center gap-2">
+      {/* Logo */}
+      <div
+        className="flex items-center gap-2 cursor-pointer"
+        onClick={() => navigate("/doctor-home")}
+      >
         <img
           src={EyeLogo}
           alt="VisiaCare Logo"
@@ -18,21 +29,58 @@ const DoctorNavbar: React.FC = () => {
         <h1 className="text-2xl font-semibold text-white">VisiaCare</h1>
       </div>
 
+      {/* Navigation Buttons */}
       <div className="flex items-center justify-center bg-white px-8 py-2 rounded-full shadow-sm gap-8">
-        <button className="text-[#1A2E44] font-semibold border-b-2 border-[#1A2E44] pb-1 transition">
+        {/* Home */}
+        <button
+          onClick={() => navigate("/doctor-home")}
+          className={`pb-1 font-semibold transition ${
+            isActive("/doctor-home")
+              ? "text-[#1A2E44] border-b-2 border-[#1A2E44]"
+              : "text-[#1A2E44]/80 hover:text-[#1A2E44]"
+          }`}
+        >
           Home
         </button>
-        <button className="text-[#1A2E44]/80 font-medium hover:text-[#1A2E44] transition">
+
+        {/* Patients */}
+        <button
+          onClick={() => navigate("/patients")}
+          className={`pb-1 font-semibold transition ${
+            isActive("/patients")
+              ? "text-[#1A2E44] border-b-2 border-[#1A2E44]"
+              : "text-[#1A2E44]/80 hover:text-[#1A2E44]"
+          }`}
+        >
           Patient
         </button>
-        <button className="text-[#1A2E44]/80 font-medium hover:text-[#1A2E44] transition">
+
+        {/* Appointments */}
+        <button
+          onClick={() => navigate("/appointments")}
+          className={`pb-1 font-semibold transition ${
+            isActive("/appointments")
+              ? "text-[#1A2E44] border-b-2 border-[#1A2E44]"
+              : "text-[#1A2E44]/80 hover:text-[#1A2E44]"
+          }`}
+        >
           Appointments
         </button>
-        <button className="text-[#1A2E44]/80 font-medium hover:text-[#1A2E44] transition">
+
+        {/* Profile */}
+        <button
+          onClick={() => navigate("/profile")}
+          className={`pb-1 font-semibold transition ${
+            isActive("/profile")
+              ? "text-[#1A2E44] border-b-2 border-[#1A2E44]"
+              : "text-[#1A2E44]/80 hover:text-[#1A2E44]"
+          }`}
+        >
           Profile
         </button>
       </div>
 
+      {/* Icons */}
       <div className="flex items-center gap-5">
         <button className="relative">
           <Bell className="text-white" size={22} />

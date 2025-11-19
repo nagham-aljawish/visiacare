@@ -3,6 +3,18 @@ import { motion } from "framer-motion";
 import { Clock, Loader2, Bell, Stethoscope, Briefcase } from "lucide-react";
 import EyeLogo from "/src/assets/eye-svgrepo-com.svg";
 
+interface UserItem {
+  id: number;
+  name: string;
+  phone_number: string;
+  gender: string;
+  email: string;
+  status: string;
+  created_at: string;
+  updated_at: string;
+  type?: string;
+}
+
 interface Item {
   id: number;
   name: string;
@@ -55,13 +67,47 @@ const AdminDashboard: React.FC = () => {
         );
 
         const data = await Promise.all(responses.map((res) => res.json()));
+        setPendingDoctors(
+          (data[0].data ?? []).map((u: UserItem) => ({
+            ...u,
+            type: "doctor",
+          }))
+        );
 
-        setPendingDoctors(data[0].data ?? []);
-        setPendingOpticals(data[1].data ?? []);
-        setApprovedDoctors(data[2].data ?? []);
-        setApprovedOpticals(data[3].data ?? []);
-        setRejectedDoctors(data[4].data ?? []);
-        setRejectedOpticals(data[5].data ?? []);
+        setPendingOpticals(
+          (data[1].data ?? []).map((u: UserItem) => ({
+            ...u,
+            type: "optical",
+          }))
+        );
+
+        setApprovedDoctors(
+          (data[2].data ?? []).map((u: UserItem) => ({
+            ...u,
+            type: "doctor",
+          }))
+        );
+
+        setApprovedOpticals(
+          (data[3].data ?? []).map((u: UserItem) => ({
+            ...u,
+            type: "optical",
+          }))
+        );
+
+        setRejectedDoctors(
+          (data[4].data ?? []).map((u: UserItem) => ({
+            ...u,
+            type: "doctor",
+          }))
+        );
+
+        setRejectedOpticals(
+          (data[5].data ?? []).map((u: UserItem) => ({
+            ...u,
+            type: "optical",
+          }))
+        );
       } catch (err) {
         console.error("API Load Error:", err);
       } finally {

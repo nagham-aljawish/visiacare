@@ -15,12 +15,16 @@ import App from "./App";
 
 import AdminDashboard from "./components/admin/AdminDashboard";
 import ProtectedRoute from "./ProtectedRoute";
-import DoctorHome from "./components/doctor/DoctorHome"; // ✅ صفحة الدكتور
+import DoctorHome from "./components/doctor/DoctorHome";
 import DoctorRegister from "./components/login&register/DoctorRegister";
 import OpticalStoreRegister from "./components/login&register/OpticalStoreRegister";
 import PatientRegister from "./components/login&register/PatientRegister";
+import PatientHome from "./components/doctor/PatientHome";
 
-// ✅ إعدادات Firebase
+// ✅ Appointments page
+import Appointments from "./components/doctor/Appointments";
+
+// إعدادات Firebase
 const firebaseConfig = {
   apiKey: "AIzaSyBWUngYt84AdgAXiIoFrItYHgMowHczYWg",
   authDomain: "visacare-112b6.firebaseapp.com",
@@ -37,7 +41,8 @@ createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <Router>
       <Routes>
-        <Route path="/" element={<App />} />
+        {/* الصفحة الرئيسية بعد تسجيل الدخول */}
+        <Route path="/home" element={<App />} />
 
         {/* صفحات التسجيل */}
         <Route path="/register/doctor" element={<DoctorRegister />} />
@@ -54,7 +59,7 @@ createRoot(document.getElementById("root")!).render(
           }
         />
 
-        {/* صفحة الدكتور بدون API */}
+        {/* صفحة الدكتور الرئيسية */}
         <Route
           path="/doctor-home"
           element={
@@ -64,16 +69,17 @@ createRoot(document.getElementById("root")!).render(
           }
         />
 
-        {/* باقي الـ dashboards */}
+        {/* إعادة التوجيه للدكتور dashboard */}
         <Route
           path="/doctor-dashboard"
           element={
             <ProtectedRoute allowedRoles={["doctor", "admin"]}>
-              <h1>Doctor Dashboard</h1>
+              <Navigate to="/doctor-home" replace />
             </ProtectedRoute>
           }
         />
 
+        {/* Dashboard لمتجر البصريات */}
         <Route
           path="/store-dashboard"
           element={
@@ -83,6 +89,7 @@ createRoot(document.getElementById("root")!).render(
           }
         />
 
+        {/* Dashboard المريض */}
         <Route
           path="/patient-dashboard"
           element={
@@ -92,7 +99,28 @@ createRoot(document.getElementById("root")!).render(
           }
         />
 
-        <Route path="*" element={<Navigate to="/" replace />} />
+        {/* واجهة المرضى */}
+        <Route
+          path="/patients"
+          element={
+            <ProtectedRoute allowedRoles={["doctor", "admin"]}>
+              <PatientHome />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* واجهة المواعيد */}
+        <Route
+          path="/appointments"
+          element={
+            <ProtectedRoute allowedRoles={["doctor", "admin"]}>
+              <Appointments />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Redirect لأي مسار غير معروف */}
+        <Route path="*" element={<Navigate to="/home" replace />} />
       </Routes>
     </Router>
   </StrictMode>
