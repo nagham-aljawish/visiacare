@@ -7,22 +7,27 @@ import DoctorNavbar from "../sharedFile/DoctorNavbar";
 interface Appointment {
   id: number;
   patientName: string;
-  date: string; // YYYY-MM-DD
-  time: string; // HH:mm
+  date: string;
+  time: string;
   reason: string;
+  status: "pending" | "approved" | "rejected";
 }
 
 const Appointments: React.FC = () => {
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [searchTerm, setSearchTerm] = useState<string>("");
+  const [activeTab, setActiveTab] = useState<
+    "pending" | "approved" | "rejected"
+  >("pending");
 
-  const appointments: Appointment[] = [
+  const [appointments, setAppointments] = useState<Appointment[]>([
     {
       id: 1,
       patientName: "Amro",
       date: "2025-11-20",
       time: "10:00",
       reason: "Checkup",
+      status: "pending",
     },
     {
       id: 2,
@@ -30,6 +35,7 @@ const Appointments: React.FC = () => {
       date: "2025-11-20",
       time: "11:00",
       reason: "Consultation",
+      status: "pending",
     },
     {
       id: 3,
@@ -37,6 +43,7 @@ const Appointments: React.FC = () => {
       date: "2025-11-21",
       time: "09:30",
       reason: "Follow-up",
+      status: "approved",
     },
     {
       id: 4,
@@ -44,21 +51,33 @@ const Appointments: React.FC = () => {
       date: "2025-11-21",
       time: "14:00",
       reason: "Consultation",
+      status: "rejected",
     },
-  ];
+  ]);
 
   const selectedDateStr = selectedDate.toISOString().split("T")[0];
 
   const filteredAppointments = appointments
     .filter((a) => a.date === selectedDateStr)
+    .filter((a) => a.status === activeTab)
     .filter((a) =>
       a.patientName.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
   const handleDateChange: CalendarProps["onChange"] = (value) => {
     if (value instanceof Date) setSelectedDate(value);
-    else if (Array.isArray(value)) setSelectedDate(value[0] ?? new Date());
-    else setSelectedDate(new Date());
+  };
+
+  const approveAppointment = (id: number) => {
+    setAppointments((prev) =>
+      prev.map((a) => (a.id === id ? { ...a, status: "approved" } : a))
+    );
+  };
+
+  const rejectAppointment = (id: number) => {
+    setAppointments((prev) =>
+      prev.map((a) => (a.id === id ? { ...a, status: "rejected" } : a))
+    );
   };
 
   return (
@@ -76,23 +95,56 @@ const Appointments: React.FC = () => {
           />
         </div>
 
-        {/* Appointments Table */}
+        {/* Appointments Section */}
         <div className="flex-1 bg-white p-6 rounded-2xl shadow-lg">
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-4 gap-4">
-            <h2 className="text-xl font-bold text-[#1A2E44]">
-              Appointments on {selectedDate.toDateString()}
-            </h2>
-            <input
-              type="text"
-              placeholder="Search by patient name..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="border border-gray-300 rounded-lg px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-[#0D1B2A]"
-            />
+          {/* Tabs */}
+          <div className="flex gap-4 mb-6 border-b pb-2">
+            <button
+              onClick={() => setActiveTab("pending")}
+              className={`px-4 py-2 font-semibold ${
+                activeTab === "pending"
+                  ? "border-b-2 border-[#1A2E44] text-[#1A2E44]"
+                  : "text-gray-500"
+              }`}
+            >
+              Pending
+            </button>
+
+            <button
+              onClick={() => setActiveTab("approved")}
+              className={`px-4 py-2 font-semibold ${
+                activeTab === "approved"
+                  ? "border-b-2 border-green-600 text-green-700"
+                  : "text-gray-500"
+              }`}
+            >
+              Approved
+            </button>
+
+            <button
+              onClick={() => setActiveTab("rejected")}
+              className={`px-4 py-2 font-semibold ${
+                activeTab === "rejected"
+                  ? "border-b-2 border-red-600 text-red-700"
+                  : "text-gray-500"
+              }`}
+            >
+              Rejected
+            </button>
           </div>
 
+          {/* Search */}
+          <input
+            type="text"
+            placeholder="Search by patient name..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="border border-gray-300 rounded-lg px-3 py-1 mb-4 text-sm focus:outline-none focus:ring-2 focus:ring-[#0D1B2A]"
+          />
+
+          {/* Table */}
           {filteredAppointments.length === 0 ? (
-            <p className="text-gray-500">No appointments on this day.</p>
+            <p className="text-gray-500">Nothing to show.</p>
           ) : (
             <table className="w-full border-collapse">
               <thead>
@@ -103,6 +155,7 @@ const Appointments: React.FC = () => {
                   <th className="p-3 text-center">Action</th>
                 </tr>
               </thead>
+
               <tbody>
                 {filteredAppointments.map((a) => (
                   <tr
@@ -112,10 +165,37 @@ const Appointments: React.FC = () => {
                     <td className="p-3 font-medium">{a.patientName}</td>
                     <td className="p-3 font-medium">{a.time}</td>
                     <td className="p-3 font-medium">{a.reason}</td>
+
                     <td className="p-3 text-center">
-                      <button className="bg-blue-600 text-white px-4 py-1.5 rounded-full text-sm hover:bg-blue-700 transition">
-                        View File
-                      </button>
+                      {activeTab === "pending" && (
+                        <div className="flex gap-3 justify-center">
+                          <button
+                            onClick={() => approveAppointment(a.id)}
+                            className="bg-green-600 text-white px-4 py-1.5 rounded-full text-sm hover:bg-green-700 transition"
+                          >
+                            Approve
+                          </button>
+
+                          <button
+                            onClick={() => rejectAppointment(a.id)}
+                            className="bg-red-600 text-white px-4 py-1.5 rounded-full text-sm hover:bg-red-700 transition"
+                          >
+                            Reject
+                          </button>
+                        </div>
+                      )}
+
+                      {activeTab !== "pending" && (
+                        <span
+                          className={`font-semibold ${
+                            a.status === "approved"
+                              ? "text-green-700"
+                              : "text-red-700"
+                          }`}
+                        >
+                          {a.status.toUpperCase()}
+                        </span>
+                      )}
                     </td>
                   </tr>
                 ))}

@@ -7,12 +7,12 @@ const DoctorNavbar: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // دالة لمعرفة الزر النشط
+  // تحديد الزر النشط
   const isActive = (path: string) => location.pathname === path;
 
   return (
     <nav className="w-full flex justify-between items-center px-8 py-4 bg-[#1A2E44] shadow-md fixed top-0 z-50">
-      {/* Logo */}
+      {/* --------- Logo --------- */}
       <div
         className="flex items-center gap-2 cursor-pointer"
         onClick={() => navigate("/doctor-home")}
@@ -29,7 +29,7 @@ const DoctorNavbar: React.FC = () => {
         <h1 className="text-2xl font-semibold text-white">VisiaCare</h1>
       </div>
 
-      {/* Navigation Buttons */}
+      {/* --------- Navigation Buttons --------- */}
       <div className="flex items-center justify-center bg-white px-8 py-2 rounded-full shadow-sm gap-8">
         {/* Home */}
         <button
@@ -69,9 +69,9 @@ const DoctorNavbar: React.FC = () => {
 
         {/* Profile */}
         <button
-          onClick={() => navigate("/profile")}
+          onClick={() => navigate("/doctor-profile")}
           className={`pb-1 font-semibold transition ${
-            isActive("/profile")
+            isActive("/doctor-profile")
               ? "text-[#1A2E44] border-b-2 border-[#1A2E44]"
               : "text-[#1A2E44]/80 hover:text-[#1A2E44]"
           }`}
@@ -80,7 +80,7 @@ const DoctorNavbar: React.FC = () => {
         </button>
       </div>
 
-      {/* Icons */}
+      {/* --------- Icons + Avatar --------- */}
       <div className="flex items-center gap-5">
         <button className="relative">
           <Bell className="text-white" size={22} />

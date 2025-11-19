@@ -21,10 +21,13 @@ import OpticalStoreRegister from "./components/login&register/OpticalStoreRegist
 import PatientRegister from "./components/login&register/PatientRegister";
 import PatientHome from "./components/doctor/PatientHome";
 
-// ✅ Appointments page
+// Appointments Page
 import Appointments from "./components/doctor/Appointments";
 
-// إعدادات Firebase
+// ⬅️ Doctor Profile Page (أضفها)
+import DoctorProfile from "./components/doctor/DoctorProfile";
+
+// Firebase config
 const firebaseConfig = {
   apiKey: "AIzaSyBWUngYt84AdgAXiIoFrItYHgMowHczYWg",
   authDomain: "visacare-112b6.firebaseapp.com",
@@ -41,15 +44,15 @@ createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <Router>
       <Routes>
-        {/* الصفحة الرئيسية بعد تسجيل الدخول */}
+        {/* Landing / Home */}
         <Route path="/home" element={<App />} />
 
-        {/* صفحات التسجيل */}
+        {/* Register Pages */}
         <Route path="/register/doctor" element={<DoctorRegister />} />
         <Route path="/register/store" element={<OpticalStoreRegister />} />
         <Route path="/register/patient" element={<PatientRegister />} />
 
-        {/* لوحات التحكم */}
+        {/* Admin Dashboard */}
         <Route
           path="/admin"
           element={
@@ -59,7 +62,7 @@ createRoot(document.getElementById("root")!).render(
           }
         />
 
-        {/* صفحة الدكتور الرئيسية */}
+        {/* Doctor Home */}
         <Route
           path="/doctor-home"
           element={
@@ -69,17 +72,13 @@ createRoot(document.getElementById("root")!).render(
           }
         />
 
-        {/* إعادة التوجيه للدكتور dashboard */}
+        {/* Redirect (deprecated) */}
         <Route
           path="/doctor-dashboard"
-          element={
-            <ProtectedRoute allowedRoles={["doctor", "admin"]}>
-              <Navigate to="/doctor-home" replace />
-            </ProtectedRoute>
-          }
+          element={<Navigate to="/doctor-home" replace />}
         />
 
-        {/* Dashboard لمتجر البصريات */}
+        {/* Store Dashboard */}
         <Route
           path="/store-dashboard"
           element={
@@ -89,7 +88,7 @@ createRoot(document.getElementById("root")!).render(
           }
         />
 
-        {/* Dashboard المريض */}
+        {/* Patient Dashboard */}
         <Route
           path="/patient-dashboard"
           element={
@@ -99,7 +98,7 @@ createRoot(document.getElementById("root")!).render(
           }
         />
 
-        {/* واجهة المرضى */}
+        {/* Patients Page */}
         <Route
           path="/patients"
           element={
@@ -109,7 +108,7 @@ createRoot(document.getElementById("root")!).render(
           }
         />
 
-        {/* واجهة المواعيد */}
+        {/* Appointments Page */}
         <Route
           path="/appointments"
           element={
@@ -119,7 +118,17 @@ createRoot(document.getElementById("root")!).render(
           }
         />
 
-        {/* Redirect لأي مسار غير معروف */}
+        {/* ⭐ Doctor Profile Page (المسار الجديد) */}
+        <Route
+          path="/doctor-profile"
+          element={
+            <ProtectedRoute allowedRoles={["doctor", "admin"]}>
+              <DoctorProfile />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Redirect unknown routes */}
         <Route path="*" element={<Navigate to="/home" replace />} />
       </Routes>
     </Router>
