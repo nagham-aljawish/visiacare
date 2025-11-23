@@ -1,5 +1,5 @@
 import React from "react";
-import { Bell, MessageSquare } from "lucide-react";
+import { Bell, Settings } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 import EyeLogo from "/src/assets/eye-svgrepo-com.svg";
 
@@ -7,12 +7,11 @@ const DoctorNavbar: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // تحديد الزر النشط
   const isActive = (path: string) => location.pathname === path;
 
   return (
     <nav className="w-full flex justify-between items-center px-8 py-4 bg-[#1A2E44] shadow-md fixed top-0 z-50">
-      {/* --------- Logo --------- */}
+      {/* Logo */}
       <div
         className="flex items-center gap-2 cursor-pointer"
         onClick={() => navigate("/doctor-home")}
@@ -29,9 +28,8 @@ const DoctorNavbar: React.FC = () => {
         <h1 className="text-2xl font-semibold text-white">VisiaCare</h1>
       </div>
 
-      {/* --------- Navigation Buttons --------- */}
+      {/* Navigation */}
       <div className="flex items-center justify-center bg-white px-8 py-2 rounded-full shadow-sm gap-8">
-        {/* Home */}
         <button
           onClick={() => navigate("/doctor-home")}
           className={`pb-1 font-semibold transition ${
@@ -43,7 +41,6 @@ const DoctorNavbar: React.FC = () => {
           Home
         </button>
 
-        {/* Patients */}
         <button
           onClick={() => navigate("/patients")}
           className={`pb-1 font-semibold transition ${
@@ -55,7 +52,6 @@ const DoctorNavbar: React.FC = () => {
           Patient
         </button>
 
-        {/* Appointments */}
         <button
           onClick={() => navigate("/appointments")}
           className={`pb-1 font-semibold transition ${
@@ -67,7 +63,6 @@ const DoctorNavbar: React.FC = () => {
           Appointments
         </button>
 
-        {/* Profile */}
         <button
           onClick={() => navigate("/doctor-profile")}
           className={`pb-1 font-semibold transition ${
@@ -80,8 +75,9 @@ const DoctorNavbar: React.FC = () => {
         </button>
       </div>
 
-      {/* --------- Icons + Avatar --------- */}
+      {/* Right Icons */}
       <div className="flex items-center gap-5">
+        {/* Notifications */}
         <button
           className="relative"
           onClick={() => navigate("/doctor-notifications")}
@@ -92,10 +88,12 @@ const DoctorNavbar: React.FC = () => {
           </span>
         </button>
 
-        <button>
-          <MessageSquare className="text-white" size={22} />
+        {/* Settings */}
+        <button onClick={() => navigate("/doctor-settings")}>
+          <Settings className="text-white" size={22} />
         </button>
 
+        {/* Avatar */}
         <img
           src="/images/DoctorIMG.jpg"
           alt="Doctor Avatar"

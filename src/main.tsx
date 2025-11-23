@@ -25,7 +25,8 @@ import Appointments from "./components/doctor/Appointments";
 // NEW PAGES
 import DoctorProfile from "./components/doctor/DoctorProfile";
 import DoctorNotifications from "./components/doctor/DoctorNotifications";
-import MedicalRecord from "./components/doctor/MedicalRecord"; // ⬅️ تمت الإضافة هنا
+import MedicalRecord from "./components/doctor/MedicalRecord";
+import DoctorSettings from "./components/doctor/DoctorSettings"; // ⬅️ تمت الإضافة
 
 // Firebase config
 const firebaseConfig = {
@@ -78,7 +79,7 @@ createRoot(document.getElementById("root")!).render(
           element={<Navigate to="/doctor-home" replace />}
         />
 
-        {/* Store */}
+        {/* Store Dashboard */}
         <Route
           path="/store-dashboard"
           element={
@@ -88,7 +89,7 @@ createRoot(document.getElementById("root")!).render(
           }
         />
 
-        {/* Patient */}
+        {/* Patient Dashboard */}
         <Route
           path="/patient-dashboard"
           element={
@@ -98,7 +99,7 @@ createRoot(document.getElementById("root")!).render(
           }
         />
 
-        {/* Patients List */}
+        {/* Patients */}
         <Route
           path="/patients"
           element={
@@ -128,7 +129,7 @@ createRoot(document.getElementById("root")!).render(
           }
         />
 
-        {/* Notifications */}
+        {/* Doctor Notifications */}
         <Route
           path="/doctor-notifications"
           element={
@@ -138,7 +139,7 @@ createRoot(document.getElementById("root")!).render(
           }
         />
 
-        {/* ⭐ NEW: Medical Record Page */}
+        {/* ⭐ NEW: Medical Record */}
         <Route
           path="/medical-record/:patientId"
           element={
@@ -148,7 +149,17 @@ createRoot(document.getElementById("root")!).render(
           }
         />
 
-        {/* Redirect unknown */}
+        {/* ⭐ NEW: Doctor Settings */}
+        <Route
+          path="/doctor-settings"
+          element={
+            <ProtectedRoute allowedRoles={["doctor", "admin"]}>
+              <DoctorSettings />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Catch-all redirect */}
         <Route path="*" element={<Navigate to="/home" replace />} />
       </Routes>
     </Router>
