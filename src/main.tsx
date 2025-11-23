@@ -20,12 +20,12 @@ import DoctorRegister from "./components/login&register/DoctorRegister";
 import OpticalStoreRegister from "./components/login&register/OpticalStoreRegister";
 import PatientRegister from "./components/login&register/PatientRegister";
 import PatientHome from "./components/doctor/PatientHome";
-
-// Appointments Page
 import Appointments from "./components/doctor/Appointments";
 
-// ⬅️ Doctor Profile Page (أضفها)
+// NEW PAGES
 import DoctorProfile from "./components/doctor/DoctorProfile";
+import DoctorNotifications from "./components/doctor/DoctorNotifications";
+import MedicalRecord from "./components/doctor/MedicalRecord"; // ⬅️ تمت الإضافة هنا
 
 // Firebase config
 const firebaseConfig = {
@@ -47,12 +47,12 @@ createRoot(document.getElementById("root")!).render(
         {/* Landing / Home */}
         <Route path="/home" element={<App />} />
 
-        {/* Register Pages */}
+        {/* Register */}
         <Route path="/register/doctor" element={<DoctorRegister />} />
         <Route path="/register/store" element={<OpticalStoreRegister />} />
         <Route path="/register/patient" element={<PatientRegister />} />
 
-        {/* Admin Dashboard */}
+        {/* Admin */}
         <Route
           path="/admin"
           element={
@@ -72,13 +72,13 @@ createRoot(document.getElementById("root")!).render(
           }
         />
 
-        {/* Redirect (deprecated) */}
+        {/* Redirect */}
         <Route
           path="/doctor-dashboard"
           element={<Navigate to="/doctor-home" replace />}
         />
 
-        {/* Store Dashboard */}
+        {/* Store */}
         <Route
           path="/store-dashboard"
           element={
@@ -88,7 +88,7 @@ createRoot(document.getElementById("root")!).render(
           }
         />
 
-        {/* Patient Dashboard */}
+        {/* Patient */}
         <Route
           path="/patient-dashboard"
           element={
@@ -98,7 +98,7 @@ createRoot(document.getElementById("root")!).render(
           }
         />
 
-        {/* Patients Page */}
+        {/* Patients List */}
         <Route
           path="/patients"
           element={
@@ -108,7 +108,7 @@ createRoot(document.getElementById("root")!).render(
           }
         />
 
-        {/* Appointments Page */}
+        {/* Appointments */}
         <Route
           path="/appointments"
           element={
@@ -118,7 +118,7 @@ createRoot(document.getElementById("root")!).render(
           }
         />
 
-        {/* ⭐ Doctor Profile Page (المسار الجديد) */}
+        {/* Doctor Profile */}
         <Route
           path="/doctor-profile"
           element={
@@ -128,7 +128,27 @@ createRoot(document.getElementById("root")!).render(
           }
         />
 
-        {/* Redirect unknown routes */}
+        {/* Notifications */}
+        <Route
+          path="/doctor-notifications"
+          element={
+            <ProtectedRoute allowedRoles={["doctor", "admin"]}>
+              <DoctorNotifications />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* ⭐ NEW: Medical Record Page */}
+        <Route
+          path="/medical-record/:patientId"
+          element={
+            <ProtectedRoute allowedRoles={["doctor", "admin"]}>
+              <MedicalRecord />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Redirect unknown */}
         <Route path="*" element={<Navigate to="/home" replace />} />
       </Routes>
     </Router>

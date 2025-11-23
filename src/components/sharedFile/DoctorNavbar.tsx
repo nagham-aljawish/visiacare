@@ -82,7 +82,10 @@ const DoctorNavbar: React.FC = () => {
 
       {/* --------- Icons + Avatar --------- */}
       <div className="flex items-center gap-5">
-        <button className="relative">
+        <button
+          className="relative"
+          onClick={() => navigate("/doctor-notifications")}
+        >
           <Bell className="text-white" size={22} />
           <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] w-4 h-4 flex items-center justify-center rounded-full">
             3
