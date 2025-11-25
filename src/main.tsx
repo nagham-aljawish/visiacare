@@ -28,7 +28,8 @@ import MedicalRecord from "./components/doctor/MedicalRecord";
 
 // Patient Pages
 import PatientRegister from "./components/login&register/PatientRegister";
-import Home from "./components/patient/Home"; // <-- هنا صفحة المريض الجديدة
+import Home from "./components/patient/Home";
+import DoctorsList from "./components/patient/DoctorsList"; // ⬅️ NEW
 
 // Optical Store Pages
 import OpticalStoreRegister from "./components/login&register/OpticalStoreRegister";
@@ -135,6 +136,17 @@ createRoot(document.getElementById("root")!).render(
             </ProtectedRoute>
           }
         />
+
+        {/* ⬅️ NEW Doctors List Page */}
+        <Route
+          path="/patient-doctors"
+          element={
+            <ProtectedRoute allowedRoles={["patient", "admin"]}>
+              <DoctorsList />
+            </ProtectedRoute>
+          }
+        />
+
         <Route
           path="/patient-appointments"
           element={
