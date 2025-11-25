@@ -105,7 +105,7 @@ const DoctorDetails: React.FC = () => {
             <motion.button
               whileTap={{ scale: 0.97 }}
               whileHover={{ scale: 1.03 }}
-              onClick={() => navigate(`/book-appointment/${doctor.id}`)}
+              onClick={() => navigate(`/patient-book-appointment/${doctor.id}`)}
               className="bg-[#1A2E44] text-white px-8 py-3 rounded-full font-medium hover:bg-[#16283b] transition"
             >
               Book Appointment

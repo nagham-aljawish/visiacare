@@ -35,6 +35,7 @@ import DoctorsList from "./components/patient/DoctorsList"; // ⬅️ NEW
 import OpticalStoreRegister from "./components/login&register/OpticalStoreRegister";
 import DoctorDetails from "./components/patient/DoctorDetails";
 import BookAppointment from "./components/patient/BookAppointment";
+import PatientAppointments from "./components/patient/PatientAppointments";
 
 // Firebase config
 const firebaseConfig = {
@@ -169,10 +170,11 @@ createRoot(document.getElementById("root")!).render(
           path="/patient-appointments"
           element={
             <ProtectedRoute allowedRoles={["patient", "admin"]}>
-              <h1>Patient Appointments Page</h1>
+              <PatientAppointments />
             </ProtectedRoute>
           }
         />
+
         <Route
           path="/patient-prescriptions"
           element={
