@@ -2,29 +2,34 @@ import React, { useState } from "react";
 import DoctorNavbar from "../sharedFile/DoctorNavbar";
 
 const DoctorProfile: React.FC = () => {
-  const [workingHours, setWorkingHours] = useState(
-    [
-      "Saturday",
-      "Sunday",
-      "Monday",
-      "Tuesday",
-      "Wednesday",
-      "Thursday",
-      "Friday",
-    ].map((day) => ({
-      day,
-      from: "",
-      to: "",
-    }))
-  );
+  const [workingHours, setWorkingHours] = useState([
+    {
+      day_in_week: "Friday,Sunday,Tuesday",
+      start_time: "09:00",
+      end_time: "14:00",
+    },
+  ]);
 
-  const handleHourChange = (
+  const handleChange = (
     index: number,
-    field: "from" | "to",
+    field: "day_in_week" | "start_time" | "end_time",
     value: string
   ) => {
     const updated = [...workingHours];
     updated[index][field] = value;
+    setWorkingHours(updated);
+  };
+
+  const addRow = () => {
+    setWorkingHours([
+      ...workingHours,
+      { day_in_week: "", start_time: "09:00", end_time: "14:00" },
+    ]);
+  };
+
+  const removeRow = (index: number) => {
+    const updated = [...workingHours];
+    updated.splice(index, 1);
     setWorkingHours(updated);
   };
 
@@ -33,15 +38,20 @@ const DoctorProfile: React.FC = () => {
       <DoctorNavbar />
 
       <div className="pt-28 px-6 lg:px-20 flex flex-col items-center gap-10">
-        {/* PROFILE CARD */}
+        {/* PROFILE CARD WITH EDIT */}
         <div className="w-full max-w-5xl bg-white/80 p-6 rounded-2xl shadow-lg flex flex-col lg:flex-row gap-6">
-          {/* IMAGE */}
-          <div className="flex-1 bg-white rounded-xl shadow">
+          {/* IMAGE + CHANGE PHOTO */}
+          <div className="flex-1 bg-white rounded-xl shadow flex flex-col items-center p-4 gap-4">
             <img
               src="/images/DoctorIMG.jpg"
               alt="Doctor"
               className="w-full h-[350px] object-cover rounded-xl"
             />
+            {/* Change photo inside the profile card */}
+            <label className="cursor-pointer mt-2 bg-[#1A2E44] text-white px-4 py-2 rounded-full hover:bg-[#16283b] transition">
+              Change Photo
+              <input type="file" className="hidden" />
+            </label>
           </div>
 
           {/* INFO */}
@@ -62,18 +72,10 @@ const DoctorProfile: React.FC = () => {
               </div>
             </div>
 
-            <button className="mt-4 bg-[#1A2E44] text-white py-2 rounded-full">
+            <button className="mt-4 bg-[#1A2E44] text-white py-2 rounded-full hover:bg-[#16283b] transition">
               Edit Profile
             </button>
           </div>
-        </div>
-
-        {/* CHANGE PHOTO */}
-        <div className="w-full max-w-5xl bg-white/70 p-6 rounded-2xl shadow-lg">
-          <h2 className="text-lg font-semibold text-[#1A2E44] flex items-center gap-2">
-            ✏ change Photo
-          </h2>
-          <input type="file" className="mt-4" />
         </div>
 
         {/* WORKING HOURS */}
@@ -85,23 +87,34 @@ const DoctorProfile: React.FC = () => {
           <table className="w-full text-left text-[#1A2E44]">
             <thead>
               <tr className="bg-[#C2DAED]">
-                <th className="p-3">Day</th>
-                <th className="p-3 text-center">From</th>
-                <th className="p-3 text-center">To</th>
+                <th className="p-3">Days of Week</th>
+                <th className="p-3 text-center">Start Time</th>
+                <th className="p-3 text-center">End Time</th>
+                <th className="p-3 text-center">Actions</th>
               </tr>
             </thead>
 
             <tbody>
               {workingHours.map((item, index) => (
-                <tr key={item.day} className="border-b">
-                  <td className="p-3 font-medium">{item.day}</td>
+                <tr key={index} className="border-b">
+                  <td className="p-3">
+                    <input
+                      type="text"
+                      value={item.day_in_week}
+                      placeholder="e.g. Friday,Sunday,Tuesday"
+                      onChange={(e) =>
+                        handleChange(index, "day_in_week", e.target.value)
+                      }
+                      className="w-full px-3 py-1 rounded-lg border border-gray-300"
+                    />
+                  </td>
 
                   <td className="p-3 text-center">
                     <input
                       type="time"
-                      value={item.from}
+                      value={item.start_time}
                       onChange={(e) =>
-                        handleHourChange(index, "from", e.target.value)
+                        handleChange(index, "start_time", e.target.value)
                       }
                       className="px-3 py-1 rounded-lg border border-gray-300"
                     />
@@ -110,19 +123,35 @@ const DoctorProfile: React.FC = () => {
                   <td className="p-3 text-center">
                     <input
                       type="time"
-                      value={item.to}
+                      value={item.end_time}
                       onChange={(e) =>
-                        handleHourChange(index, "to", e.target.value)
+                        handleChange(index, "end_time", e.target.value)
                       }
                       className="px-3 py-1 rounded-lg border border-gray-300"
                     />
+                  </td>
+
+                  <td className="p-3 text-center">
+                    <button
+                      onClick={() => removeRow(index)}
+                      className="bg-red-600 text-white px-3 py-1 rounded-lg hover:bg-red-700 transition"
+                    >
+                      Delete
+                    </button>
                   </td>
                 </tr>
               ))}
             </tbody>
           </table>
 
-          <div className="flex justify-center mt-6">
+          <div className="flex justify-between mt-6">
+            <button
+              onClick={addRow}
+              className="bg-green-600 text-white px-6 py-2 rounded-full hover:bg-green-700 transition"
+            >
+              Add Row
+            </button>
+
             <button className="bg-[#1A2E44] text-white px-6 py-2 rounded-full hover:bg-[#16283b] transition">
               Save Working Hours
             </button>
