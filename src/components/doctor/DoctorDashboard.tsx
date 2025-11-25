@@ -1,9 +1,18 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
-import { Bell, CalendarDays, FileText, Users, Stethoscope } from "lucide-react";
+import {
+  Bell,
+  CalendarDays,
+  FileText,
+  Users,
+  Stethoscope,
+  Home,
+} from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const DoctorDashboard: React.FC = () => {
   const [active, setActive] = useState("dashboard");
+  const navigate = useNavigate();
 
   return (
     <div className="min-h-screen flex flex-col sm:flex-row bg-[#DDE9F7] text-[#1A2E44]">
@@ -37,21 +46,31 @@ const DoctorDashboard: React.FC = () => {
 
           <hr className="border-white/20 my-4" />
 
+          <button
+            onClick={() => navigate("/doctor-home")}
+            className="flex items-center gap-2 px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 w-full"
+          >
+            <Home className="w-5 h-5" /> Back to Home
+          </button>
+
           <button className="text-left px-4 py-2 rounded-lg bg-red-600 hover:bg-red-700 w-full">
             Logout
           </button>
         </nav>
       </aside>
 
-      {/* Main */}
-      <main className="flex-1 min-h-screen p-6 sm:p-10 overflow-y-auto bg-[#A8CFEB]">
-        {active === "dashboard" && <DoctorDashboardHome />}
-        {active === "patients" && <Patients />}
-        {active === "appointments" && <Appointments />}
-        {active === "medical records" && <MedicalRecords />}
-        {active === "notifications" && <Notifications />}
-        {active === "profile" && <Profile />}
-        {active === "settings" && <SettingsPage />}
+      {/* Main Content */}
+      <main className="flex-1 min-h-screen flex flex-col">
+        {/* Dashboard Content */}
+        <div className="flex-1 p-6 sm:p-10 overflow-y-auto">
+          {active === "dashboard" && <DoctorDashboardHome />}
+          {active === "patients" && <Patients />}
+          {active === "appointments" && <Appointments />}
+          {active === "medical records" && <MedicalRecords />}
+          {active === "notifications" && <Notifications />}
+          {active === "profile" && <Profile />}
+          {active === "settings" && <SettingsPage />}
+        </div>
       </main>
     </div>
   );
@@ -82,27 +101,17 @@ const SidebarBtn = ({
 );
 
 /* ===== Dashboard Home ===== */
-
-const DoctorDashboardHome = () => {
-  return (
-    <>
-      <h1 className="text-3xl font-bold mb-6 text-[#0D1B2A]">
-        Doctor Dashboard
-      </h1>
-
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-        <StatCard title="Patients" value={58} icon={<Users />} />
-        <StatCard
-          title="Appointments Today"
-          value={12}
-          icon={<CalendarDays />}
-        />
-        <StatCard title="Pending Reports" value={7} icon={<FileText />} />
-        <StatCard title="Notifications" value={3} icon={<Bell />} />
-      </div>
-    </>
-  );
-};
+const DoctorDashboardHome = () => (
+  <>
+    <h1 className="text-3xl font-bold mb-6 text-[#0D1B2A]">Doctor Dashboard</h1>
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+      <StatCard title="Patients" value={58} icon={<Users />} />
+      <StatCard title="Appointments Today" value={12} icon={<CalendarDays />} />
+      <StatCard title="Pending Reports" value={7} icon={<FileText />} />
+      <StatCard title="Notifications" value={3} icon={<Bell />} />
+    </div>
+  </>
+);
 
 const StatCard = ({
   title,
@@ -123,17 +132,13 @@ const StatCard = ({
   </motion.div>
 );
 
-/* =============================
-   Patients (Dummy Data)
-============================= */
-
+/* ===== Dummy Data Sections ===== */
 const Patients = () => {
   const patients = [
     { id: 1, name: "Ahmad Khaled", age: 32, gender: "Male" },
     { id: 2, name: "Sara Youssef", age: 27, gender: "Female" },
     { id: 3, name: "Omar Ali", age: 45, gender: "Male" },
   ];
-
   return (
     <Section title="Patients List">
       <table className="w-full">
@@ -158,17 +163,12 @@ const Patients = () => {
   );
 };
 
-/* =============================
-   Appointments (Dummy Data)
-============================= */
-
 const Appointments = () => {
   const data = [
     { id: 1, name: "Ahmad Khaled", time: "10:00 AM", status: "Upcoming" },
     { id: 2, name: "Maya Ali", time: "12:30 PM", status: "Upcoming" },
     { id: 3, name: "Rami Youssef", time: "03:00 PM", status: "Completed" },
   ];
-
   return (
     <Section title="Appointments">
       <table className="w-full">
@@ -196,17 +196,12 @@ const Appointments = () => {
   );
 };
 
-/* =============================
-   Medical Records (Dummy Data)
-============================= */
-
 const MedicalRecords = () => {
   const records = [
     { id: 1, name: "Ahmad Khaled", report: "Eye dryness & redness" },
     { id: 2, name: "Sara Youssef", report: "Myopia -1.00" },
     { id: 3, name: "Omar Ali", report: "Follow-up needed" },
   ];
-
   return (
     <Section title="Medical Records">
       <ul className="space-y-3">
@@ -221,17 +216,12 @@ const MedicalRecords = () => {
   );
 };
 
-/* =============================
-   Notifications (Dummy Data)
-============================= */
-
 const Notifications = () => {
   const notifications = [
     "New appointment booked with Rana.",
     "Medical report updated for Ahmad.",
     "Reminder: Meeting at 5 PM.",
   ];
-
   return (
     <Section title="Notifications">
       <ul className="space-y-3">
@@ -245,10 +235,6 @@ const Notifications = () => {
   );
 };
 
-/* =============================
-   Profile (Dummy Data)
-============================= */
-
 const Profile = () => {
   const doctor = {
     name: "Dr. Ali Hassan",
@@ -256,7 +242,6 @@ const Profile = () => {
     email: "doctor@example.com",
     phone: "+963 991 234 567",
   };
-
   return (
     <Section title="Profile">
       <p>
@@ -275,10 +260,6 @@ const Profile = () => {
   );
 };
 
-/* =============================
-   Settings
-============================= */
-
 const SettingsPage = () => (
   <Section title="Settings">
     <p>System preferences and general settings will be here.</p>
@@ -286,7 +267,6 @@ const SettingsPage = () => (
 );
 
 /* ===== Wrapper Section Component ===== */
-
 const Section = ({
   title,
   children,
