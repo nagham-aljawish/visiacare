@@ -64,7 +64,7 @@ const Login: React.FC = () => {
           navigate("/doctor-dashboard");
           break;
         case "patient":
-          navigate("/patient-dashboard");
+          navigate("/patient-home");
           break;
         case "store":
           navigate("/store-dashboard");
