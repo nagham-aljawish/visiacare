@@ -33,6 +33,8 @@ import DoctorsList from "./components/patient/DoctorsList"; // ⬅️ NEW
 
 // Optical Store Pages
 import OpticalStoreRegister from "./components/login&register/OpticalStoreRegister";
+import DoctorDetails from "./components/patient/DoctorDetails";
+import BookAppointment from "./components/patient/BookAppointment";
 
 // Firebase config
 const firebaseConfig = {
@@ -143,6 +145,22 @@ createRoot(document.getElementById("root")!).render(
           element={
             <ProtectedRoute allowedRoles={["patient", "admin"]}>
               <DoctorsList />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/doctor-details/:id"
+          element={
+            <ProtectedRoute allowedRoles={["patient"]}>
+              <DoctorDetails />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/patient-book-appointment/:id"
+          element={
+            <ProtectedRoute allowedRoles={["patient"]}>
+              <BookAppointment />
             </ProtectedRoute>
           }
         />
