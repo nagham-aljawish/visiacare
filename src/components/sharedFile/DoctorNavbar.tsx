@@ -93,12 +93,17 @@ const DoctorNavbar: React.FC = () => {
           <Settings className="text-white" size={22} />
         </button>
 
-        {/* Avatar */}
-        <img
-          src="/images/DoctorIMG.jpg"
-          alt="Doctor Avatar"
-          className="w-10 h-10 rounded-full border-2 border-white object-cover"
-        />
+        {/* Avatar + Online Indicator */}
+        <div className="relative">
+          <img
+            src="/images/DoctorIMG.jpg"
+            alt="Doctor Avatar"
+            className="w-10 h-10 rounded-full border-2 border-white object-cover"
+          />
+
+          {/* Online Dot (Top-Right) */}
+          <span className="absolute top-0 right-0 w-3 h-3 bg-green-500 rounded-full border-[2px] border-white shadow-sm"></span>
+        </div>
       </div>
     </nav>
   );

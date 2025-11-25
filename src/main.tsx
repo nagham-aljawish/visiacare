@@ -26,7 +26,8 @@ import Appointments from "./components/doctor/Appointments";
 import DoctorProfile from "./components/doctor/DoctorProfile";
 import DoctorNotifications from "./components/doctor/DoctorNotifications";
 import MedicalRecord from "./components/doctor/MedicalRecord";
-import DoctorSettings from "./components/doctor/DoctorSettings"; // ⬅️ تمت الإضافة
+import DoctorSettings from "./components/doctor/DoctorSettings";
+import DoctorDashboard from "./components/doctor/DoctorDashboard";
 
 // Firebase config
 const firebaseConfig = {
@@ -73,10 +74,14 @@ createRoot(document.getElementById("root")!).render(
           }
         />
 
-        {/* Redirect */}
+        {/* Doctor Dashboard */}
         <Route
           path="/doctor-dashboard"
-          element={<Navigate to="/doctor-home" replace />}
+          element={
+            <ProtectedRoute allowedRoles={["doctor", "admin"]}>
+              <DoctorDashboard />
+            </ProtectedRoute>
+          }
         />
 
         {/* Store Dashboard */}
@@ -139,7 +144,7 @@ createRoot(document.getElementById("root")!).render(
           }
         />
 
-        {/* ⭐ NEW: Medical Record */}
+        {/* Medical Record */}
         <Route
           path="/medical-record/:patientId"
           element={
@@ -149,7 +154,7 @@ createRoot(document.getElementById("root")!).render(
           }
         />
 
-        {/* ⭐ NEW: Doctor Settings */}
+        {/* Doctor Settings */}
         <Route
           path="/doctor-settings"
           element={
@@ -159,7 +164,7 @@ createRoot(document.getElementById("root")!).render(
           }
         />
 
-        {/* Catch-all redirect */}
+        {/* Catch all */}
         <Route path="*" element={<Navigate to="/home" replace />} />
       </Routes>
     </Router>
