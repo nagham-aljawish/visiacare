@@ -1,15 +1,77 @@
 import React, { useState } from "react";
 import DoctorNavbar from "../sharedFile/DoctorNavbar";
 
+interface WorkingHour {
+  day_in_week: string;
+  start_time: string;
+  end_time: string;
+  status?: "saved" | "error" | "idle";
+}
+
 const DoctorProfile: React.FC = () => {
-  const [workingHours, setWorkingHours] = useState([
+  const [workingHours, setWorkingHours] = useState<WorkingHour[]>([
     {
       day_in_week: "Friday,Sunday,Tuesday",
       start_time: "09:00",
       end_time: "14:00",
+      status: "idle",
     },
   ]);
 
+  const doctor_id = 8; // عدل حسب الدكتور الحالي
+  const token = localStorage.getItem("token"); // لو عندك توكن مصادقة
+
+  // 🔹 Auto-save لكل تعديل
+  const saveRow = async (index: number, item: WorkingHour) => {
+    try {
+      const url = "http://127.0.0.1:8000/api/doctor/availability";
+
+      const response = await fetch(url, {
+        method: "PUT", // أو "POST" حسب حاجتك
+        headers: {
+          "Content-Type": "application/json",
+          ...(token && { Authorization: `Bearer ${token}` }),
+        },
+        body: JSON.stringify({
+          day_in_week: item.day_in_week,
+          start_time: item.start_time,
+          end_time: item.end_time,
+          doctor_id,
+        }),
+      });
+
+      const text = await response.text();
+      let result;
+      try {
+        result = JSON.parse(text);
+      } catch {
+        console.error("Server returned non-JSON response:", text);
+        updateStatus(index, "error");
+        return;
+      }
+
+      if (result.status === "success") {
+        updateStatus(index, "saved");
+      } else {
+        updateStatus(index, "error");
+      }
+      console.log("PUT response:", result);
+    } catch (err) {
+      console.error("Auto-save error:", err);
+      updateStatus(index, "error");
+    }
+  };
+
+  // تحديث حالة الصف بعد الحفظ
+  const updateStatus = (index: number, status: "saved" | "error" | "idle") => {
+    setWorkingHours((prev) => {
+      const updated = [...prev];
+      updated[index].status = status;
+      return updated;
+    });
+  };
+
+  // 🔹 تعديل الصف
   const handleChange = (
     index: number,
     field: "day_in_week" | "start_time" | "end_time",
@@ -17,16 +79,14 @@ const DoctorProfile: React.FC = () => {
   ) => {
     const updated = [...workingHours];
     updated[index][field] = value;
+    updated[index].status = "idle"; // إعادة الحالة إلى idle أثناء التعديل
     setWorkingHours(updated);
+
+    // حفظ تلقائي
+    saveRow(index, updated[index]);
   };
 
-  const addRow = () => {
-    setWorkingHours([
-      ...workingHours,
-      { day_in_week: "", start_time: "09:00", end_time: "14:00" },
-    ]);
-  };
-
+  // 🔹 حذف صف
   const removeRow = (index: number) => {
     const updated = [...workingHours];
     updated.splice(index, 1);
@@ -38,23 +98,20 @@ const DoctorProfile: React.FC = () => {
       <DoctorNavbar />
 
       <div className="pt-28 px-6 lg:px-20 flex flex-col items-center gap-10">
-        {/* PROFILE CARD WITH EDIT */}
+        {/* PROFILE CARD */}
         <div className="w-full max-w-5xl bg-white/80 p-6 rounded-2xl shadow-lg flex flex-col lg:flex-row gap-6">
-          {/* IMAGE + CHANGE PHOTO */}
           <div className="flex-1 bg-white rounded-xl shadow flex flex-col items-center p-4 gap-4">
             <img
               src="/images/DoctorIMG.jpg"
               alt="Doctor"
               className="w-full h-[350px] object-cover rounded-xl"
             />
-            {/* Change photo inside the profile card */}
             <label className="cursor-pointer mt-2 bg-[#1A2E44] text-white px-4 py-2 rounded-full hover:bg-[#16283b] transition">
               Change Photo
               <input type="file" className="hidden" />
             </label>
           </div>
 
-          {/* INFO */}
           <div className="flex-1 bg-[#D7E7F5] p-6 rounded-xl shadow flex flex-col gap-4">
             <h2 className="text-xl font-bold text-center text-[#1A2E44]">
               Dr. John Smith
@@ -90,6 +147,7 @@ const DoctorProfile: React.FC = () => {
                 <th className="p-3">Days of Week</th>
                 <th className="p-3 text-center">Start Time</th>
                 <th className="p-3 text-center">End Time</th>
+                <th className="p-3 text-center">Status</th>
                 <th className="p-3 text-center">Actions</th>
               </tr>
             </thead>
@@ -101,7 +159,6 @@ const DoctorProfile: React.FC = () => {
                     <input
                       type="text"
                       value={item.day_in_week}
-                      placeholder="e.g. Friday,Sunday,Tuesday"
                       onChange={(e) =>
                         handleChange(index, "day_in_week", e.target.value)
                       }
@@ -132,6 +189,24 @@ const DoctorProfile: React.FC = () => {
                   </td>
 
                   <td className="p-3 text-center">
+                    {item.status === "saved" && (
+                      <span className="text-green-600 font-semibold">
+                        Saved ✅
+                      </span>
+                    )}
+                    {item.status === "error" && (
+                      <span className="text-red-600 font-semibold">
+                        Error ⚠️
+                      </span>
+                    )}
+                    {item.status === "idle" && (
+                      <span className="text-gray-500 font-semibold">
+                        Editing...
+                      </span>
+                    )}
+                  </td>
+
+                  <td className="p-3 text-center">
                     <button
                       onClick={() => removeRow(index)}
                       className="bg-red-600 text-white px-3 py-1 rounded-lg hover:bg-red-700 transition"
@@ -143,19 +218,6 @@ const DoctorProfile: React.FC = () => {
               ))}
             </tbody>
           </table>
-
-          <div className="flex justify-between mt-6">
-            <button
-              onClick={addRow}
-              className="bg-green-600 text-white px-6 py-2 rounded-full hover:bg-green-700 transition"
-            >
-              Add Row
-            </button>
-
-            <button className="bg-[#1A2E44] text-white px-6 py-2 rounded-full hover:bg-[#16283b] transition">
-              Save Working Hours
-            </button>
-          </div>
         </div>
       </div>
     </div>

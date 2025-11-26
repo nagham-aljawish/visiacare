@@ -329,7 +329,7 @@ const PendingRequestsTable = ({
 
   return (
     <motion.div
-      className="bg-[#CCDCE9] rounded-2xl shadow-xl p-6 mt-8"
+      className="bg-[#CCDCE9] rounded-2xl shadow-xl p-6 mt-8 overflow-x-auto"
       initial={{ opacity: 0, y: 15 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4 }}
