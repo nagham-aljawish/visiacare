@@ -1,46 +1,76 @@
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
 import PatientNavbar from "../sharedFile/PatientNavbar";
 
-const DoctorsList = () => {
-  const navigate = useNavigate();
+interface Doctor {
+  id: number;
+  name: string;
+  email: string;
+  phone_number: string;
+  gender: string;
+  status: string;
+  license: string;
+  location: string;
+  shift: string;
+  bio: string;
+  role: string;
+}
 
-  const dummyDoctors = [
-    {
-      id: 1,
-      name: "Dr. Sarah Khaled",
-      specialization: "Ophthalmologist",
-      experience: "8 Years",
-      image: "/images/female-doctor.jpg",
-    },
-    {
-      id: 2,
-      name: "Dr. Ahmad Hassan",
-      specialization: "Eye Surgeon",
-      experience: "12 Years",
-      image: "/images/male-doctor.jpg",
-    },
-    {
-      id: 3,
-      name: "Dr. Lina Yousef",
-      specialization: "Retina Specialist",
-      experience: "6 Years",
-      image: "/images/female-doctor2.jpg",
-    },
-  ];
+const DoctorsList: React.FC = () => {
+  const navigate = useNavigate();
+  const [doctors, setDoctors] = useState<Doctor[]>([]);
+  const [loading, setLoading] = useState(true);
+  const token = localStorage.getItem("token"); // إذا فيه توكن مصادقة
+
+  useEffect(() => {
+    const fetchDoctors = async () => {
+      setLoading(true);
+      try {
+        const response = await fetch(
+          "http://127.0.0.1:8000/api/doctor/approved",
+          {
+            headers: {
+              "Content-Type": "application/json",
+              ...(token && { Authorization: `Bearer ${token}` }),
+            },
+          }
+        );
+
+        const data = await response.json();
+        if (data.status === "success") {
+          setDoctors(data.data.doctors);
+        } else {
+          console.error("Failed to fetch doctors:", data.message);
+        }
+      } catch (err) {
+        console.error("Error fetching doctors:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchDoctors();
+  }, [token]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex justify-center items-center">
+        <p className="text-[#1A2E44] text-lg">Loading doctors...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-[#E9F2FA]">
       <PatientNavbar />
 
-      {/* Title */}
       <h1 className="text-4xl font-bold text-[#1A2E44] text-center pt-24 mb-10 tracking-wide">
         Available Doctors
       </h1>
 
-      {/* Cards Wrapper */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10 px-6 max-w-6xl mx-auto pb-16">
-        {dummyDoctors.map((doctor) => (
+        {doctors.map((doctor) => (
           <motion.div
             key={doctor.id}
             initial={{ opacity: 0, y: 40 }}
@@ -49,29 +79,30 @@ const DoctorsList = () => {
             whileHover={{ scale: 1.03 }}
             className="bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all p-6 border border-gray-100"
           >
-            {/* Doctor Image */}
             <div className="flex justify-center">
               <img
-                src={doctor.image}
+                src={
+                  doctor.gender === "male"
+                    ? "/images/DoctorIMG.jpg"
+                    : "/images/doctorFemale.jpg"
+                }
                 alt={doctor.name}
                 className="w-32 h-32 object-cover rounded-xl shadow-md border-2 border-gray-200"
               />
             </div>
 
-            {/* Info */}
             <h2 className="text-xl font-semibold text-center mt-5 text-[#1A2E44]">
               {doctor.name}
             </h2>
 
             <p className="text-center text-gray-600 text-sm mt-1">
-              {doctor.specialization}
+              {doctor.bio || doctor.role}
             </p>
 
             <p className="text-center text-gray-500 text-sm mt-1">
-              Experience: {doctor.experience}
+              Location: {doctor.location}
             </p>
 
-            {/* Buttons */}
             <div className="flex justify-center gap-4 mt-6">
               <button
                 onClick={() => navigate(`/doctor-details/${doctor.id}`)}
