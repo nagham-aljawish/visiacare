@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import {
   Bell,
@@ -8,11 +9,34 @@ import {
   Stethoscope,
   Home,
 } from "lucide-react";
-import { useNavigate } from "react-router-dom";
 
 const DoctorDashboard: React.FC = () => {
   const [active, setActive] = useState("dashboard");
   const navigate = useNavigate();
+
+  // Logout via API
+  const handleLogout = async () => {
+    try {
+      const token = localStorage.getItem("token"); // توكن الدخول
+      const response = await fetch("http://127.0.0.1:8000/api/auth/logout", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) {
+        console.error("Logout failed:", response.statusText);
+      }
+    } catch (err) {
+      console.error("Error logging out:", err);
+    } finally {
+      localStorage.removeItem("token");
+      localStorage.removeItem("role");
+      navigate("/home");
+    }
+  };
 
   return (
     <div className="min-h-screen flex flex-col sm:flex-row bg-[#DDE9F7] text-[#1A2E44]">
@@ -53,7 +77,11 @@ const DoctorDashboard: React.FC = () => {
             <Home className="w-5 h-5" /> Back to Home
           </button>
 
-          <button className="text-left px-4 py-2 rounded-lg bg-red-600 hover:bg-red-700 w-full">
+          {/* Logout Button */}
+          <button
+            onClick={handleLogout}
+            className="text-left px-4 py-2 rounded-lg bg-red-600 hover:bg-red-700 w-full"
+          >
             Logout
           </button>
         </nav>
@@ -61,7 +89,6 @@ const DoctorDashboard: React.FC = () => {
 
       {/* Main Content */}
       <main className="flex-1 min-h-screen flex flex-col">
-        {/* Dashboard Content */}
         <div className="flex-1 p-6 sm:p-10 overflow-y-auto">
           {active === "dashboard" && <DoctorDashboardHome />}
           {active === "patients" && <Patients />}
@@ -78,7 +105,7 @@ const DoctorDashboard: React.FC = () => {
 
 export default DoctorDashboard;
 
-/* Sidebar button */
+/* Sidebar Button */
 const SidebarBtn = ({
   label,
   active,
@@ -100,7 +127,7 @@ const SidebarBtn = ({
   </button>
 );
 
-/* ===== Dashboard Home ===== */
+/* ===== Dummy Components ===== */
 const DoctorDashboardHome = () => (
   <>
     <h1 className="text-3xl font-bold mb-6 text-[#0D1B2A]">Doctor Dashboard</h1>
@@ -132,7 +159,6 @@ const StatCard = ({
   </motion.div>
 );
 
-/* ===== Dummy Data Sections ===== */
 const Patients = () => {
   const patients = [
     { id: 1, name: "Ahmad Khaled", age: 32, gender: "Male" },
@@ -266,7 +292,7 @@ const SettingsPage = () => (
   </Section>
 );
 
-/* ===== Wrapper Section Component ===== */
+/* Section Wrapper */
 const Section = ({
   title,
   children,
@@ -277,7 +303,7 @@ const Section = ({
   <motion.div
     initial={{ opacity: 0, y: 15 }}
     animate={{ opacity: 1, y: 0 }}
-    className="bg-[#CCDCE9] rounded-2xl shadow-xl p-6"
+    className="bg-[#CCDCE9] rounded-2xl shadow-xl p-6 mb-6"
   >
     <h1 className="text-2xl font-bold mb-4 text-[#0D1B2A]">{title}</h1>
     {children}
