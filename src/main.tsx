@@ -11,8 +11,10 @@ import {
 
 import { initializeApp } from "firebase/app";
 
+// Pages
 import App from "./App";
 
+// Admin
 import AdminDashboard from "./components/admin/AdminDashboard";
 import ProtectedRoute from "./ProtectedRoute";
 
@@ -25,17 +27,17 @@ import DoctorNotifications from "./components/doctor/DoctorNotifications";
 import DoctorSettings from "./components/doctor/DoctorSettings";
 import Appointments from "./components/doctor/Appointments";
 import MedicalRecord from "./components/doctor/MedicalRecord";
-
+import PatientHome from "./components/doctor/PatientHome";
 // Patient Pages
 import PatientRegister from "./components/login&register/PatientRegister";
 import Home from "./components/patient/Home";
-import DoctorsList from "./components/patient/DoctorsList"; // ⬅️ NEW
-
-// Optical Store Pages
-import OpticalStoreRegister from "./components/login&register/OpticalStoreRegister";
+import DoctorsList from "./components/patient/DoctorsList";
 import DoctorDetails from "./components/patient/DoctorDetails";
 import BookAppointment from "./components/patient/BookAppointment";
 import PatientAppointments from "./components/patient/PatientAppointments";
+
+// Optical Store Pages
+import OpticalStoreRegister from "./components/login&register/OpticalStoreRegister";
 
 // Firebase config
 const firebaseConfig = {
@@ -62,7 +64,7 @@ createRoot(document.getElementById("root")!).render(
         <Route path="/register/store" element={<OpticalStoreRegister />} />
         <Route path="/register/patient" element={<PatientRegister />} />
 
-        {/* Admin */}
+        {/* Admin Routes */}
         <Route
           path="/admin"
           element={
@@ -122,6 +124,14 @@ createRoot(document.getElementById("root")!).render(
           }
         />
         <Route
+          path="/patients-home"
+          element={
+            <ProtectedRoute allowedRoles={["doctor", "admin"]}>
+              <PatientHome />
+            </ProtectedRoute>
+          }
+        />
+        <Route
           path="/medical-record/:patientId"
           element={
             <ProtectedRoute allowedRoles={["doctor", "admin"]}>
@@ -139,12 +149,10 @@ createRoot(document.getElementById("root")!).render(
             </ProtectedRoute>
           }
         />
-
-        {/* ⬅️ NEW Doctors List Page */}
         <Route
           path="/patient-doctors"
           element={
-            <ProtectedRoute allowedRoles={["patient", "admin"]}>
+            <ProtectedRoute allowedRoles={["patient"]}>
               <DoctorsList />
             </ProtectedRoute>
           }
@@ -165,20 +173,18 @@ createRoot(document.getElementById("root")!).render(
             </ProtectedRoute>
           }
         />
-
         <Route
           path="/patient-appointments"
           element={
-            <ProtectedRoute allowedRoles={["patient", "admin"]}>
+            <ProtectedRoute allowedRoles={["patient"]}>
               <PatientAppointments />
             </ProtectedRoute>
           }
         />
-
         <Route
           path="/patient-prescriptions"
           element={
-            <ProtectedRoute allowedRoles={["patient", "admin"]}>
+            <ProtectedRoute allowedRoles={["patient"]}>
               <h1>Patient Prescriptions Page</h1>
             </ProtectedRoute>
           }
@@ -186,7 +192,7 @@ createRoot(document.getElementById("root")!).render(
         <Route
           path="/patient-profile"
           element={
-            <ProtectedRoute allowedRoles={["patient", "admin"]}>
+            <ProtectedRoute allowedRoles={["patient"]}>
               <h1>Patient Profile Page</h1>
             </ProtectedRoute>
           }
@@ -194,13 +200,13 @@ createRoot(document.getElementById("root")!).render(
         <Route
           path="/patient-optical-shops"
           element={
-            <ProtectedRoute allowedRoles={["patient", "admin"]}>
+            <ProtectedRoute allowedRoles={["patient"]}>
               <h1>Patient Optical Shops Page</h1>
             </ProtectedRoute>
           }
         />
 
-        {/* Catch all */}
+        {/* Catch-all fallback */}
         <Route path="*" element={<Navigate to="/home" replace />} />
       </Routes>
     </Router>

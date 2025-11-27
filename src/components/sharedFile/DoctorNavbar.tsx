@@ -42,9 +42,9 @@ const DoctorNavbar: React.FC = () => {
         </button>
 
         <button
-          onClick={() => navigate("/patients")}
+          onClick={() => navigate("/patients-home")}
           className={`pb-1 font-semibold transition ${
-            isActive("/patients")
+            isActive("/patients-home")
               ? "text-[#1A2E44] border-b-2 border-[#1A2E44]"
               : "text-[#1A2E44]/80 hover:text-[#1A2E44]"
           }`}
@@ -101,7 +101,6 @@ const DoctorNavbar: React.FC = () => {
             className="w-10 h-10 rounded-full border-2 border-white object-cover"
           />
 
-          {/* Online Dot (Top-Right) */}
           <span className="absolute top-0 right-0 w-3 h-3 bg-green-500 rounded-full border-[2px] border-white shadow-sm"></span>
         </div>
       </div>
