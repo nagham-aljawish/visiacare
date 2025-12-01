@@ -9,8 +9,6 @@ import {
   Navigate,
 } from "react-router-dom";
 
-import { initializeApp } from "firebase/app";
-
 // Pages
 import App from "./App";
 
@@ -28,6 +26,7 @@ import DoctorSettings from "./components/doctor/DoctorSettings";
 import Appointments from "./components/doctor/Appointments";
 import MedicalRecord from "./components/doctor/MedicalRecord";
 import PatientHome from "./components/doctor/PatientHome";
+
 // Patient Pages
 import PatientRegister from "./components/login&register/PatientRegister";
 import Home from "./components/patient/Home";
@@ -38,19 +37,6 @@ import PatientAppointments from "./components/patient/PatientAppointments";
 
 // Optical Store Pages
 import OpticalStoreRegister from "./components/login&register/OpticalStoreRegister";
-
-// Firebase config
-const firebaseConfig = {
-  apiKey: "AIzaSyBWUngYt84AdgAXiIoFrItYHgMowHczYWg",
-  authDomain: "visacare-112b6.firebaseapp.com",
-  projectId: "visacare-112b6",
-  storageBucket: "visacare-112b6.firebasestorage.app",
-  messagingSenderId: "980175293543",
-  appId: "1:980175293543:web:c59c565fc4611b79bfd8c2",
-  measurementId: "G-GDJBKG68FX",
-};
-
-initializeApp(firebaseConfig);
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
@@ -178,30 +164,6 @@ createRoot(document.getElementById("root")!).render(
           element={
             <ProtectedRoute allowedRoles={["patient"]}>
               <PatientAppointments />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/patient-prescriptions"
-          element={
-            <ProtectedRoute allowedRoles={["patient"]}>
-              <h1>Patient Prescriptions Page</h1>
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/patient-profile"
-          element={
-            <ProtectedRoute allowedRoles={["patient"]}>
-              <h1>Patient Profile Page</h1>
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/patient-optical-shops"
-          element={
-            <ProtectedRoute allowedRoles={["patient"]}>
-              <h1>Patient Optical Shops Page</h1>
             </ProtectedRoute>
           }
         />

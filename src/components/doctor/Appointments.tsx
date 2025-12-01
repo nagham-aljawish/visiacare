@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Calendar from "react-calendar";
 import type { CalendarProps } from "react-calendar";
 import "react-calendar/dist/Calendar.css";
@@ -19,41 +19,44 @@ const Appointments: React.FC = () => {
   const [activeTab, setActiveTab] = useState<
     "pending" | "approved" | "rejected"
   >("pending");
+  const [appointments, setAppointments] = useState<Appointment[]>([]);
+  const [loading, setLoading] = useState<boolean>(false);
 
-  const [appointments, setAppointments] = useState<Appointment[]>([
-    {
-      id: 1,
-      patientName: "Amro",
-      date: "2025-11-20",
-      time: "10:00",
-      reason: "Checkup",
-      status: "pending",
-    },
-    {
-      id: 2,
-      patientName: "Nour",
-      date: "2025-11-20",
-      time: "11:00",
-      reason: "Consultation",
-      status: "pending",
-    },
-    {
-      id: 3,
-      patientName: "Sara",
-      date: "2025-11-21",
-      time: "09:30",
-      reason: "Follow-up",
-      status: "approved",
-    },
-    {
-      id: 4,
-      patientName: "Amro",
-      date: "2025-11-21",
-      time: "14:00",
-      reason: "Consultation",
-      status: "rejected",
-    },
-  ]);
+  const token = localStorage.getItem("token");
+
+  // ================================
+  // FETCH APPOINTMENTS (API)
+  // ================================
+  const fetchAppointments = async () => {
+    if (!token) return;
+    setLoading(true);
+    try {
+      const response = await fetch(
+        "http://127.0.0.1:8000/api/appointments/pending",
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      const result = await response.json();
+      if (result.status === "success") {
+        setAppointments(result.data);
+      } else {
+        console.error("API error:", result);
+      }
+    } catch (error) {
+      console.error("Error fetching appointments:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchAppointments();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const selectedDateStr = selectedDate.toISOString().split("T")[0];
 
@@ -68,18 +71,49 @@ const Appointments: React.FC = () => {
     if (value instanceof Date) setSelectedDate(value);
   };
 
-  const approveAppointment = (id: number) => {
-    setAppointments((prev) =>
-      prev.map((a) => (a.id === id ? { ...a, status: "approved" } : a))
-    );
+  // ================================
+  // APPROVE / REJECT FUNCTIONS
+  // ================================
+  const updateAppointmentStatus = async (
+    id: number,
+    action: "approve" | "reject"
+  ) => {
+    if (!token) return;
+    try {
+      const response = await fetch(
+        `http://127.0.0.1:8000/api/appointments/${id}/${action}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (!response.ok) throw new Error(`Failed to ${action} appointment`);
+
+      // تحديث الـ state مباشرة بعد النجاح
+      setAppointments((prev) =>
+        prev.map((a) =>
+          a.id === id
+            ? { ...a, status: action === "approve" ? "approved" : "rejected" }
+            : a
+        )
+      );
+    } catch (error) {
+      console.error(`Error ${action} appointment:`, error);
+    }
   };
 
-  const rejectAppointment = (id: number) => {
-    setAppointments((prev) =>
-      prev.map((a) => (a.id === id ? { ...a, status: "rejected" } : a))
-    );
-  };
+  const approveAppointment = (id: number) =>
+    updateAppointmentStatus(id, "approve");
+  const rejectAppointment = (id: number) =>
+    updateAppointmentStatus(id, "reject");
 
+  // ================================
+  // RENDER
+  // ================================
   return (
     <div className="min-h-screen bg-[#E9F2FA] flex flex-col">
       <DoctorNavbar />
@@ -143,7 +177,9 @@ const Appointments: React.FC = () => {
           />
 
           {/* Table */}
-          {filteredAppointments.length === 0 ? (
+          {loading ? (
+            <p className="text-gray-500">Loading...</p>
+          ) : filteredAppointments.length === 0 ? (
             <p className="text-gray-500">Nothing to show.</p>
           ) : (
             <table className="w-full border-collapse">

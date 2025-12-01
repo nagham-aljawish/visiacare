@@ -1,104 +1,99 @@
 import { useState } from "react";
-import PatientNavbar from "../sharedFile/PatientNavbar";
-import { motion } from "framer-motion";
+import { useLocation } from "react-router-dom";
+
+interface Availability {
+  id: number;
+  day_in_week: string;
+  start_time: string;
+  end_time: string;
+  doctor_id: number;
+}
 
 const BookAppointment: React.FC = () => {
-  const [selectedDoctor, setSelectedDoctor] = useState("Dr. Sarah Khaled");
-  const [selectedDate, setSelectedDate] = useState("");
-  const [selectedTime, setSelectedTime] = useState("");
-  const [confirmed, setConfirmed] = useState(false);
+  const location = useLocation();
+  const { availability, selectedDay } = location.state as {
+    availability: Availability;
+    selectedDay: string;
+  };
 
-  // بيانات وهمية
-  const doctors = ["Dr. Sarah Khaled", "Dr. Ahmad Hassan", "Dr. Lina Yousef"];
-  const times = ["09:00 AM", "10:30 AM", "12:00 PM", "02:00 PM", "04:00 PM"];
-  const dates = ["2025-11-26", "2025-11-27", "2025-11-28", "2025-11-29"];
+  const token = localStorage.getItem("token");
 
-  const handleBooking = () => {
-    if (!selectedDate || !selectedTime) return alert("Select date & time");
-    setConfirmed(true);
+  const [appointmentDate, setAppointmentDate] = useState<string>("");
+  const [appointmentTime, setAppointmentTime] = useState<string>("");
+  const [loading, setLoading] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!appointmentDate || !appointmentTime) {
+      alert("Please select date and time.");
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      const res = await fetch("http://127.0.0.1:8000/api/appointments/book", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        credentials: "include",
+        body: JSON.stringify({
+          availability_id: availability.id,
+          appointment_date: appointmentDate,
+          appointment_time: appointmentTime,
+        }),
+      });
+
+      if (!res.ok) {
+        throw new Error(`HTTP error! status: ${res.status}`);
+      }
+
+      const data = await res.json();
+      console.log("Appointment booked:", data);
+      alert("Appointment booked successfully!");
+    } catch (err) {
+      console.error("Error booking appointment:", err);
+      alert("Failed to book appointment. Check console for details.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
-    <div className="min-h-screen bg-[#E9F2FA]">
-      <PatientNavbar />
-
-      <div className="max-w-3xl mx-auto p-6">
-        <h1 className="text-3xl font-bold text-[#1A2E44] mb-6 text-center">
-          Book an Appointment
-        </h1>
-
-        <div className="bg-white p-6 rounded-2xl shadow-lg space-y-5">
+    <div className="min-h-screen bg-gradient-to-br from-[#0f172a] to-[#1e293b] flex items-center justify-center p-6">
+      <div className="w-full max-w-md bg-[#1e293b]/70 backdrop-blur-xl border border-white/10 rounded-2xl p-6 shadow-xl">
+        <h2 className="text-2xl font-semibold text-white mb-4 text-center">
+          Book Appointment for {selectedDay}
+        </h2>
+        <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block mb-1 font-medium text-[#1A2E44]">
-              Doctor
-            </label>
-            <select
-              className="w-full p-3 rounded-lg border border-gray-300"
-              value={selectedDoctor}
-              onChange={(e) => setSelectedDoctor(e.target.value)}
-            >
-              {doctors.map((doc) => (
-                <option key={doc} value={doc}>
-                  {doc}
-                </option>
-              ))}
-            </select>
+            <label className="text-gray-300 mb-1 block">Date:</label>
+            <input
+              type="date"
+              value={appointmentDate}
+              onChange={(e) => setAppointmentDate(e.target.value)}
+              className="w-full p-2 rounded-md border border-gray-600 bg-[#0f172a] text-white"
+            />
           </div>
-
           <div>
-            <label className="block mb-1 font-medium text-[#1A2E44]">
-              Date
-            </label>
-            <select
-              className="w-full p-3 rounded-lg border border-gray-300"
-              value={selectedDate}
-              onChange={(e) => setSelectedDate(e.target.value)}
-            >
-              <option value="">Select Date</option>
-              {dates.map((d) => (
-                <option key={d} value={d}>
-                  {d}
-                </option>
-              ))}
-            </select>
+            <label className="text-gray-300 mb-1 block">Time:</label>
+            <input
+              type="time"
+              value={appointmentTime}
+              onChange={(e) => setAppointmentTime(e.target.value)}
+              className="w-full p-2 rounded-md border border-gray-600 bg-[#0f172a] text-white"
+            />
           </div>
-
-          <div>
-            <label className="block mb-1 font-medium text-[#1A2E44]">
-              Time
-            </label>
-            <select
-              className="w-full p-3 rounded-lg border border-gray-300"
-              value={selectedTime}
-              onChange={(e) => setSelectedTime(e.target.value)}
-            >
-              <option value="">Select Time</option>
-              {times.map((t) => (
-                <option key={t} value={t}>
-                  {t}
-                </option>
-              ))}
-            </select>
-          </div>
-
           <button
-            className="w-full bg-[#1A2E44] text-white py-3 rounded-full hover:bg-[#16283b] transition"
-            onClick={handleBooking}
+            type="submit"
+            disabled={loading}
+            className="w-full py-2 bg-green-600 hover:bg-green-700 rounded-lg text-white font-medium transition"
           >
-            Book Appointment
+            {loading ? "Booking..." : "Book Appointment"}
           </button>
-
-          {confirmed && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="mt-4 p-4 bg-green-100 text-green-800 rounded-lg text-center"
-            >
-              Appointment booked with {selectedDoctor} on {selectedDate} at{" "}
-              {selectedTime}!
-            </motion.div>
-          )}
-        </div>
+        </form>
       </div>
     </div>
   );
