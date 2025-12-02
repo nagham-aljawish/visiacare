@@ -79,7 +79,7 @@ const PatientAppointments: React.FC = () => {
               <button
                 className="mt-5 w-full bg-[#1A2E44] text-white py-2 rounded-full hover:bg-[#16283b] transition"
                 // لاحقًا ممكن تضيف تعديل/إلغاء موعد
-                onClick={() => alert(`Manage appointment #${appt.id}`)}
+                // onClick={() => alert(`Manage appointment #${appt.id}`)}
               >
                 Manage Appointment
               </button>

@@ -42,6 +42,8 @@ const Login: React.FC = () => {
       const data = await response.json();
       setLoading(false);
 
+      localStorage.setItem("token", data.token);
+
       if (!response.ok) {
         setError(data.message || "Login failed. Please try again.");
         return;
@@ -51,7 +53,7 @@ const Login: React.FC = () => {
       console.log("Token:", data.token);
       console.log("Role:", data.role);
 
-      localStorage.setItem("token", data.token);
+      // localStorage.setItem("token", data.token);
       localStorage.setItem("role", data.role);
 
       const role = data.role.toLowerCase();

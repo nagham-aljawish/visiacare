@@ -7,6 +7,7 @@ interface Availability {
   start_time: string;
   end_time: string;
   doctor_id: number;
+  doctor_availabilities_id: number;
 }
 
 const BookAppointment: React.FC = () => {
@@ -23,43 +24,39 @@ const BookAppointment: React.FC = () => {
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!appointmentDate || !appointmentTime) {
-      alert("Please select date and time.");
-      return;
-    }
+  e.preventDefault();
 
-    setLoading(true);
+  if (!appointmentDate || !appointmentTime) {
+    return;
+  }
 
-    try {
-      const res = await fetch("http://127.0.0.1:8000/api/appointments/book", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        credentials: "include",
-        body: JSON.stringify({
-          availability_id: availability.id,
-          appointment_date: appointmentDate,
-          appointment_time: appointmentTime,
-        }),
-      });
+  setLoading(true);
 
-      if (!res.ok) {
-        throw new Error(`HTTP error! status: ${res.status}`);
-      }
+  try {
+    const res = await fetch("http://127.0.0.1:8000/api/appointments/book", {
+      method: "POST",
+      headers: {
+        "Accept": "application/json",
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        availability_id:availability.doctor_availabilities_id,
+        appointment_date: appointmentDate,
+        appointment_time: appointmentTime,
+      }),
+    });
 
-      const data = await res.json();
-      console.log("Appointment booked:", data);
-      alert("Appointment booked successfully!");
-    } catch (err) {
-      console.error("Error booking appointment:", err);
-      alert("Failed to book appointment. Check console for details.");
-    } finally {
-      setLoading(false);
-    }
-  };
+
+
+    const data = await res.json();
+    console.log("Appointment booked:", data);
+  } catch (err) {
+    console.error("Error booking appointment:", err);
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#0f172a] to-[#1e293b] flex items-center justify-center p-6">

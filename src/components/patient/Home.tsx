@@ -1,5 +1,5 @@
 import React from "react";
-import PatientNavbar from "../sharedFile/PatientNavbar"; // لو عندك navbar خاص بالمريض
+import PatientNavbar from "../sharedFile/PatientNavbar"; 
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 
@@ -16,7 +16,7 @@ const Home: React.FC = () => {
           initial={{ opacity: 0, x: 40 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 1 }}
-          src="/images/patientPhoto.jpg" // ضع صورة مناسبة للمريض
+          src="/images/patientPhoto.jpg" 
           alt="Patient illustration"
           className="w-[280px] sm:w-[340px] lg:w-[460px] drop-shadow-2xl order-2 lg:order-1"
         />
