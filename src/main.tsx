@@ -26,7 +26,7 @@ import DoctorSettings from "./components/doctor/DoctorSettings";
 import Appointments from "./components/doctor/Appointments";
 import MedicalRecord from "./components/doctor/MedicalRecord";
 import PatientHome from "./components/doctor/PatientHome";
-
+import PrescriptionCreate from "./components/doctor/PrescriptionCreate";
 // Patient Pages
 import PatientRegister from "./components/login&register/PatientRegister";
 import Home from "./components/patient/Home";
@@ -122,6 +122,14 @@ createRoot(document.getElementById("root")!).render(
           element={
             <ProtectedRoute allowedRoles={["doctor", "admin"]}>
               <MedicalRecord />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/medical-record/:recordId/prescription"
+          element={
+            <ProtectedRoute allowedRoles={["doctor", "admin"]}>
+              <PrescriptionCreate />
             </ProtectedRoute>
           }
         />
