@@ -11,7 +11,6 @@ const DoctorNavbar: React.FC = () => {
 
   return (
     <nav className="w-full flex justify-between items-center px-8 py-4 bg-[#1A2E44] shadow-md fixed top-0 z-50">
-      {/* Logo */}
       <div
         className="flex items-center gap-2 cursor-pointer"
         onClick={() => navigate("/doctor-home")}
@@ -28,7 +27,6 @@ const DoctorNavbar: React.FC = () => {
         <h1 className="text-2xl font-semibold text-white">VisiaCare</h1>
       </div>
 
-      {/* Navigation */}
       <div className="flex items-center justify-center bg-white px-8 py-2 rounded-full shadow-sm gap-8">
         <button
           onClick={() => navigate("/doctor-home")}
@@ -62,22 +60,9 @@ const DoctorNavbar: React.FC = () => {
         >
           Appointments
         </button>
-
-        <button
-          onClick={() => navigate("/doctor-profile")}
-          className={`pb-1 font-semibold transition ${
-            isActive("/doctor-profile")
-              ? "text-[#1A2E44] border-b-2 border-[#1A2E44]"
-              : "text-[#1A2E44]/80 hover:text-[#1A2E44]"
-          }`}
-        >
-          Profile
-        </button>
       </div>
 
-      {/* Right Icons */}
       <div className="flex items-center gap-5">
-        {/* Notifications */}
         <button
           className="relative"
           onClick={() => navigate("/doctor-notifications")}
@@ -88,12 +73,10 @@ const DoctorNavbar: React.FC = () => {
           </span>
         </button>
 
-        {/* Settings */}
         <button onClick={() => navigate("/doctor-settings")}>
           <Settings className="text-white" size={22} />
         </button>
 
-        {/* Avatar + Online Indicator */}
         <div className="relative">
           <img
             src="/images/DoctorIMG.jpg"

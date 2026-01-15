@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { Eye, EyeOff } from "lucide-react";
 import EyeLogo from "/src/assets/eye-svgrepo-com.svg";
+import { useNavigate } from "react-router-dom";
 
 const OpticalStoreRegister: React.FC = () => {
   const [storeName, setStoreName] = useState("");
@@ -18,6 +19,7 @@ const OpticalStoreRegister: React.FC = () => {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -65,7 +67,8 @@ const OpticalStoreRegister: React.FC = () => {
         setError(data.message || "Something went wrong. Try again.");
         return;
       }
-
+      
+      navigate("/")
       setSuccess(
         "Your registration request has been sent successfully. Please wait for admin approval before logging in."
       );
@@ -162,7 +165,6 @@ const OpticalStoreRegister: React.FC = () => {
             className="w-full px-3 py-2.5 text-[14px] rounded-lg bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-300"
           />
 
-          {/* Password with Eye icon */}
           <div className="relative">
             <input
               type={showPassword ? "text" : "password"}
@@ -230,7 +232,7 @@ const OpticalStoreRegister: React.FC = () => {
           <p className="text-center text-[#1A2E44]/80 text-sm mt-2">
             Already have an account?{" "}
             <a
-              href="/store-login"
+              href="/home"
               className="underline font-medium hover:text-[#1A2E44]"
             >
               Login here

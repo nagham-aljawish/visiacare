@@ -12,7 +12,6 @@ const DoctorRegister: React.FC = () => {
   const [gender, setGender] = useState("");
   const [license, setLicense] = useState("");
   const [location, setLocation] = useState("");
-  const [shift, setShift] = useState(""); // date
   const [bio, setBio] = useState("");
 
   const [error, setError] = useState("");
@@ -32,8 +31,7 @@ const DoctorRegister: React.FC = () => {
       !password ||
       !gender ||
       !license ||
-      !location ||
-      !shift
+      !location
     ) {
       setError("Please fill out all required fields.");
       setLoading(false);
@@ -54,7 +52,6 @@ const DoctorRegister: React.FC = () => {
             gender,
             license,
             location,
-            shift,
             bio,
           }),
         }
@@ -72,7 +69,6 @@ const DoctorRegister: React.FC = () => {
         "Your registration request has been sent successfully. Please wait for admin approval before logging in."
       );
 
-      // Clear inputs
       setName("");
       setEmail("");
       setPhoneNumber("");
@@ -80,7 +76,6 @@ const DoctorRegister: React.FC = () => {
       setGender("");
       setLicense("");
       setLocation("");
-      setShift("");
       setBio("");
     } catch (err) {
       console.error("Error:", err);
@@ -104,7 +99,6 @@ const DoctorRegister: React.FC = () => {
         transition={{ duration: 0.6, ease: "easeOut" }}
         className="relative z-10 w-[400px] bg-[#CCDCE9]/40 backdrop-blur-md p-8 rounded-2xl shadow-2xl border border-white/30"
       >
-        {/* Header */}
         <div className="text-center mb-8">
           <div className="flex justify-center items-center gap-2 mb-2">
             <img
@@ -121,7 +115,6 @@ const DoctorRegister: React.FC = () => {
           <p className="text-[#1A2E44]/80 text-sm">Doctor Registration Form</p>
         </div>
 
-        {/* Form */}
         <form onSubmit={handleSubmit} className="flex flex-col space-y-3.5">
           <input
             type="text"
@@ -147,7 +140,6 @@ const DoctorRegister: React.FC = () => {
             className="w-full px-3 py-2.5 text-[14px] rounded-lg bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-300"
           />
 
-          {/* ✅ Password with Eye icon */}
           <div className="relative">
             <input
               type={showPassword ? "text" : "password"}
@@ -190,19 +182,7 @@ const DoctorRegister: React.FC = () => {
             onChange={(e) => setLocation(e.target.value)}
             className="w-full px-3 py-2.5 text-[14px] rounded-lg bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-300"
           />
-
-          <div>
-            <label className="block text-[#1A2E44] mb-1 text-sm font-medium">
-              Work Shift Date
-            </label>
-            <input
-              type="date"
-              value={shift}
-              onChange={(e) => setShift(e.target.value)}
-              className="w-full px-3 py-2.5 text-[14px] rounded-lg bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-300"
-            />
-          </div>
-
+          
           <textarea
             placeholder="Short bio (optional)"
             value={bio}
@@ -233,7 +213,7 @@ const DoctorRegister: React.FC = () => {
           <p className="text-center text-[#1A2E44]/80 text-sm mt-2">
             Already have an account?{" "}
             <a
-              href="/doctor-login"
+              href="/"
               className="underline font-medium hover:text-[#1A2E44]"
             >
               Login here

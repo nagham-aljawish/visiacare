@@ -1,56 +1,51 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
+import { ToastContainer } from "react-toastify";
 import "./index.css";
 
-import {
-  BrowserRouter as Router,
-  Routes,
-  Route,
-  Navigate,
-} from "react-router-dom";
-
-// Pages
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import App from "./App";
-
-// Admin
 import AdminDashboard from "./components/admin/AdminDashboard";
 import ProtectedRoute from "./ProtectedRoute";
-
-// Doctor Pages
 import DoctorHome from "./components/doctor/DoctorHome";
 import DoctorRegister from "./components/login&register/DoctorRegister";
 import DoctorDashboard from "./components/doctor/DoctorDashboard";
-import DoctorProfile from "./components/doctor/DoctorProfile";
-import DoctorNotifications from "./components/doctor/DoctorNotifications";
-import DoctorSettings from "./components/doctor/DoctorSettings";
 import Appointments from "./components/doctor/Appointments";
-import MedicalRecord from "./components/doctor/MedicalRecord";
-import PatientHome from "./components/doctor/PatientHome";
-import PrescriptionCreate from "./components/doctor/PrescriptionCreate";
-// Patient Pages
 import PatientRegister from "./components/login&register/PatientRegister";
 import Home from "./components/patient/Home";
 import DoctorsList from "./components/patient/DoctorsList";
 import DoctorDetails from "./components/patient/DoctorDetails";
 import BookAppointment from "./components/patient/BookAppointment";
 import PatientAppointments from "./components/patient/PatientAppointments";
-
-// Optical Store Pages
+import OpticalList from "./components/patient/OpticalList"
+import PatientPrescriptions from "./components/patient/PatientPrescriptions";
+import OpticalStoreProducts from "./components/patient/OpticalStoreProducts";
+import PatientNotifications from "./components/patient/PatientNotifications";
 import OpticalStoreRegister from "./components/login&register/OpticalStoreRegister";
+import StoreOrders from "./components/optical/StoreOrders";
+import StoreInventory from "./components/optical/StoreInventory";
+import OpticalShops from "./components/patient/OpticalShops";
+import AcceptedOrders from "./components/optical/Acceptedorder";
+import PatientOrders from "./components/patient/PatientOrders";
+import OpticalNotifications from "./components/optical/OpticalNotifications";
+import OpticalProfile from "./components/optical/Profile";
+import PatientProfile from "./components/patient/PatientProfile";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
+    <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        pauseOnHover
+        closeOnClick
+        draggable
+      />
     <Router>
       <Routes>
-        {/* Landing / Home */}
-        <Route path="/home" element={<App />} />
-
-        {/* Register */}
+        <Route path="/" element={<App />} />
         <Route path="/register/doctor" element={<DoctorRegister />} />
         <Route path="/register/store" element={<OpticalStoreRegister />} />
         <Route path="/register/patient" element={<PatientRegister />} />
-
-        {/* Admin Routes */}
         <Route
           path="/admin"
           element={
@@ -59,8 +54,6 @@ createRoot(document.getElementById("root")!).render(
             </ProtectedRoute>
           }
         />
-
-        {/* Doctor Routes */}
         <Route
           path="/doctor-home"
           element={
@@ -78,30 +71,6 @@ createRoot(document.getElementById("root")!).render(
           }
         />
         <Route
-          path="/doctor-profile"
-          element={
-            <ProtectedRoute allowedRoles={["doctor", "admin"]}>
-              <DoctorProfile />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/doctor-notifications"
-          element={
-            <ProtectedRoute allowedRoles={["doctor", "admin"]}>
-              <DoctorNotifications />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/doctor-settings"
-          element={
-            <ProtectedRoute allowedRoles={["doctor", "admin"]}>
-              <DoctorSettings />
-            </ProtectedRoute>
-          }
-        />
-        <Route
           path="/appointments"
           element={
             <ProtectedRoute allowedRoles={["doctor", "admin"]}>
@@ -109,32 +78,6 @@ createRoot(document.getElementById("root")!).render(
             </ProtectedRoute>
           }
         />
-        <Route
-          path="/patients-home"
-          element={
-            <ProtectedRoute allowedRoles={["doctor", "admin"]}>
-              <PatientHome />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/medical-record/:patientId"
-          element={
-            <ProtectedRoute allowedRoles={["doctor", "admin"]}>
-              <MedicalRecord />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/medical-record/:recordId/prescription"
-          element={
-            <ProtectedRoute allowedRoles={["doctor", "admin"]}>
-              <PrescriptionCreate />
-            </ProtectedRoute>
-          }
-        />
-
-        {/* Patient Routes */}
         <Route
           path="/patient-home"
           element={
@@ -175,9 +118,92 @@ createRoot(document.getElementById("root")!).render(
             </ProtectedRoute>
           }
         />
+        <Route
+          path="/patient-optical-shops"
+          element={
+            <ProtectedRoute allowedRoles={["patient"]}>
+              <OpticalList />
+            </ProtectedRoute>
+          }
+        />
+        
+        <Route
+          path="/patient-prescriptions"
+          element={
+            <ProtectedRoute allowedRoles={["patient"]}>
+              <PatientPrescriptions />
+            </ProtectedRoute>
+          }
+        />
 
-        {/* Catch-all fallback */}
-        <Route path="*" element={<Navigate to="/home" replace />} />
+        <Route
+          path="/patient-notifications"
+          element={
+            <ProtectedRoute allowedRoles={["patient"]}>
+              <PatientNotifications />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route path="/store-orders" element={<StoreOrders />} />
+        <Route
+          path="/accepted-orders"
+          element={<AcceptedOrders />}
+        />
+        <Route path="/store-inventory" element={<StoreInventory />} />
+
+        <Route
+          path="/patient-prescriptions"
+          element={
+            <ProtectedRoute allowedRoles={["patient"]}>
+              <PatientPrescriptions />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/patient-optical-shops"
+          element={
+            <ProtectedRoute allowedRoles={["patient"]}>
+              <OpticalShops />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/patient-orders"
+          element={
+              <PatientOrders/>
+          }
+        />
+
+        <Route
+          path="/optical-store/:id/products"
+          element={
+            <ProtectedRoute allowedRoles={["patient"]}>
+              <OpticalStoreProducts />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/opticl-notifications"
+          element={
+            <OpticalNotifications />
+          }
+        />
+
+        <Route
+          path="/optical-profile"
+          element={
+            <OpticalProfile />
+          }
+        />
+
+        <Route
+          path="/patient-profile"
+          element={
+            <PatientProfile />
+          }
+        />
       </Routes>
     </Router>
   </StrictMode>

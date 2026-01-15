@@ -1,227 +1,147 @@
-import React, { useState } from "react";
-import DoctorNavbar from "../sharedFile/DoctorNavbar";
-
-interface WorkingHour {
-  day_in_week: string;
-  start_time: string;
-  end_time: string;
-  status?: "saved" | "error" | "idle";
-}
+import React, { useState, useEffect } from "react";
+import { 
+  User, 
+  Mail, 
+  MapPin, 
+  Award, 
+  BookOpen, 
+  Calendar as CalendarIcon, 
+  ShieldCheck,
+  ArrowRight
+} from "lucide-react";
 
 const DoctorProfile: React.FC = () => {
-  const [workingHours, setWorkingHours] = useState<WorkingHour[]>([
-    {
-      day_in_week: "Friday,Sunday,Tuesday",
-      start_time: "09:00",
-      end_time: "14:00",
-      status: "idle",
-    },
-  ]);
+  const [profileData, setProfileData] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const token = localStorage.getItem("token");
 
-  const doctor_id = 8; // عدل حسب الدكتور الحالي
-  const token = localStorage.getItem("token"); // لو عندك توكن مصادقة
-
-  // 🔹 Auto-save لكل تعديل
-  const saveRow = async (index: number, item: WorkingHour) => {
+  const fetchProfile = async () => {
+    if (!token) return;
     try {
-      const url = "http://127.0.0.1:8000/api/doctor/availability";
-
-      const response = await fetch(url, {
-        method: "PUT", // أو "POST" حسب حاجتك
+      const res = await fetch("http://127.0.0.1:8000/api/me/doctor", {
         headers: {
-          "Content-Type": "application/json",
-          ...(token && { Authorization: `Bearer ${token}` }),
+          Authorization: `Bearer ${token}`,
+          Accept: "application/json",
         },
-        body: JSON.stringify({
-          day_in_week: item.day_in_week,
-          start_time: item.start_time,
-          end_time: item.end_time,
-          doctor_id,
-        }),
       });
-
-      const text = await response.text();
-      let result;
-      try {
-        result = JSON.parse(text);
-      } catch {
-        console.error("Server returned non-JSON response:", text);
-        updateStatus(index, "error");
-        return;
-      }
+      const result = await res.json();
 
       if (result.status === "success") {
-        updateStatus(index, "saved");
-      } else {
-        updateStatus(index, "error");
+        setProfileData(result.data);
       }
-      console.log("PUT response:", result);
     } catch (err) {
-      console.error("Auto-save error:", err);
-      updateStatus(index, "error");
+      console.error("Error fetching doctor profile:", err);
+    } finally {
+      setLoading(false);
     }
   };
 
-  // تحديث حالة الصف بعد الحفظ
-  const updateStatus = (index: number, status: "saved" | "error" | "idle") => {
-    setWorkingHours((prev) => {
-      const updated = [...prev];
-      updated[index].status = status;
-      return updated;
-    });
-  };
-
-  // 🔹 تعديل الصف
-  const handleChange = (
-    index: number,
-    field: "day_in_week" | "start_time" | "end_time",
-    value: string
-  ) => {
-    const updated = [...workingHours];
-    updated[index][field] = value;
-    updated[index].status = "idle"; // إعادة الحالة إلى idle أثناء التعديل
-    setWorkingHours(updated);
-
-    // حفظ تلقائي
-    saveRow(index, updated[index]);
-  };
-
-  // 🔹 حذف صف
-  const removeRow = (index: number) => {
-    const updated = [...workingHours];
-    updated.splice(index, 1);
-    setWorkingHours(updated);
-  };
+  useEffect(() => {
+    fetchProfile();
+  }, []);
 
   return (
-    <div className="min-h-screen bg-[#E9F2FA] flex flex-col">
-      <DoctorNavbar />
-
-      <div className="pt-28 px-6 lg:px-20 flex flex-col items-center gap-10">
-        {/* PROFILE CARD */}
-        <div className="w-full max-w-5xl bg-white/80 p-6 rounded-2xl shadow-lg flex flex-col lg:flex-row gap-6">
-          <div className="flex-1 bg-white rounded-xl shadow flex flex-col items-center p-4 gap-4">
-            <img
-              src="/images/DoctorIMG.jpg"
-              alt="Doctor"
-              className="w-full h-[350px] object-cover rounded-xl"
-            />
-            <label className="cursor-pointer mt-2 bg-[#1A2E44] text-white px-4 py-2 rounded-full hover:bg-[#16283b] transition">
-              Change Photo
-              <input type="file" className="hidden" />
-            </label>
+    <div className="min-h-screen bg-[#E9F2FA] pb-10 px-4">
+      <div className="max-w-4xl mx-auto">
+        {loading ? (
+          <div className="flex flex-col items-center justify-center p-20 bg-white rounded-3xl shadow-sm">
+            <div className="w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mb-4"></div>
+            <p className="text-gray-500 animate-pulse font-medium">Loading your profile...</p>
           </div>
+        ) : profileData ? (
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            
+            <div className="lg:col-span-1">
+              <div className="bg-white rounded-3xl p-8 shadow-sm border-b-4 border-blue-600 flex flex-col items-center text-center">
+                <div className="relative mb-6">
+                  <div className="w-32 h-32 bg-gradient-to-br from-blue-50 to-blue-100 rounded-full flex items-center justify-center border-4 border-white shadow-md">
+                    <User size={60} className="text-blue-600" />
+                  </div>
+                </div>
+                
+                <h2 className="text-xl font-extrabold text-[#1A2E44] mb-1">
+                  {profileData.user.name}
+                </h2>
+                <span className="bg-blue-50 text-blue-600 text-xs font-bold px-4 py-1.5 rounded-full uppercase tracking-widest mb-6">
+                  {profileData.user.role}
+                </span>
 
-          <div className="flex-1 bg-[#D7E7F5] p-6 rounded-xl shadow flex flex-col gap-4">
-            <h2 className="text-xl font-bold text-center text-[#1A2E44]">
-              Dr. John Smith
-            </h2>
-
-            <div className="space-y-3">
-              <div className="p-3 bg-white rounded-lg shadow">
-                📧 dr.johnsmith@gmail.com
-              </div>
-              <div className="p-3 bg-white rounded-lg shadow">
-                📞 +963 9xx xxx xxx
-              </div>
-              <div className="p-3 bg-white rounded-lg shadow">
-                🏥 Vision Eye Clinic
+                <div className="w-full pt-6 border-t border-gray-50 space-y-4">
+                    <div className="flex items-center gap-3 text-sm text-gray-600">
+                        <CalendarIcon size={16} className="text-blue-400" />
+                        <span>Joined {new Date(profileData.profile.created_at).toLocaleDateString()}</span>
+                    </div>
+                    <div className="flex items-center gap-3 text-sm text-gray-600">
+                        <ShieldCheck size={16} className="text-green-500" />
+                        <span>Verified Medical Doctor</span>
+                    </div>
+                </div>
               </div>
             </div>
 
-            <button className="mt-4 bg-[#1A2E44] text-white py-2 rounded-full hover:bg-[#16283b] transition">
-              Edit Profile
-            </button>
+            <div className="lg:col-span-2 space-y-6">
+              
+              <div className="bg-white rounded-3xl p-8 shadow-sm">
+                <h3 className="text-lg font-bold text-[#1A2E44] mb-6 flex items-center gap-2">
+                    <ArrowRight size={18} className="text-blue-600" />
+                    Professional Information
+                </h3>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <InfoCard 
+                    icon={<Mail size={20} />} 
+                    label="Email Address" 
+                    value={profileData.user.email} 
+                    color="text-blue-600"
+                  />
+                  <InfoCard 
+                    icon={<Award size={20} />} 
+                    label="Medical License" 
+                    value={profileData.profile.license} 
+                    color="text-yellow-600"
+                  />
+                  <div className="md:col-span-2">
+                    <InfoCard 
+                        icon={<MapPin size={20} />} 
+                        label="Work Location" 
+                        value={profileData.profile.location} 
+                        color="text-red-500"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-white rounded-3xl p-8 shadow-sm relative overflow-hidden">
+                <div className="absolute top-0 right-0 p-4 opacity-5">
+                </div>
+                <h3 className="text-lg font-bold text-[#1A2E44] mb-4 flex items-center gap-2">
+                    <BookOpen size={18} className="text-blue-600" />
+                    Doctor's Bio
+                </h3>
+                <p className="text-[#1A2E44] leading-relaxed italic bg-blue-50/50 p-6 rounded-2xl border border-blue-50 shadow-inner">
+                  "{profileData.profile.bio}"
+                </p>
+              </div>
+            </div>
           </div>
-        </div>
-
-        {/* WORKING HOURS */}
-        <div className="w-full max-w-5xl bg-[#D4E6F6] p-6 rounded-2xl shadow-lg">
-          <h2 className="text-xl font-semibold text-[#1A2E44] text-center underline mb-4">
-            Working Hours
-          </h2>
-
-          <table className="w-full text-left text-[#1A2E44]">
-            <thead>
-              <tr className="bg-[#C2DAED]">
-                <th className="p-3">Days of Week</th>
-                <th className="p-3 text-center">Start Time</th>
-                <th className="p-3 text-center">End Time</th>
-                <th className="p-3 text-center">Status</th>
-                <th className="p-3 text-center">Actions</th>
-              </tr>
-            </thead>
-
-            <tbody>
-              {workingHours.map((item, index) => (
-                <tr key={index} className="border-b">
-                  <td className="p-3">
-                    <input
-                      type="text"
-                      value={item.day_in_week}
-                      onChange={(e) =>
-                        handleChange(index, "day_in_week", e.target.value)
-                      }
-                      className="w-full px-3 py-1 rounded-lg border border-gray-300"
-                    />
-                  </td>
-
-                  <td className="p-3 text-center">
-                    <input
-                      type="time"
-                      value={item.start_time}
-                      onChange={(e) =>
-                        handleChange(index, "start_time", e.target.value)
-                      }
-                      className="px-3 py-1 rounded-lg border border-gray-300"
-                    />
-                  </td>
-
-                  <td className="p-3 text-center">
-                    <input
-                      type="time"
-                      value={item.end_time}
-                      onChange={(e) =>
-                        handleChange(index, "end_time", e.target.value)
-                      }
-                      className="px-3 py-1 rounded-lg border border-gray-300"
-                    />
-                  </td>
-
-                  <td className="p-3 text-center">
-                    {item.status === "saved" && (
-                      <span className="text-green-600 font-semibold">
-                        Saved ✅
-                      </span>
-                    )}
-                    {item.status === "error" && (
-                      <span className="text-red-600 font-semibold">
-                        Error ⚠️
-                      </span>
-                    )}
-                    {item.status === "idle" && (
-                      <span className="text-gray-500 font-semibold">
-                        Editing...
-                      </span>
-                    )}
-                  </td>
-
-                  <td className="p-3 text-center">
-                    <button
-                      onClick={() => removeRow(index)}
-                      className="bg-red-600 text-white px-3 py-1 rounded-lg hover:bg-red-700 transition"
-                    >
-                      Delete
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+        ) : (
+          <div className="bg-white p-12 rounded-3xl text-center shadow-sm">
+            <p className="text-gray-500 italic">No profile data could be retrieved.</p>
+          </div>
+        )}
       </div>
     </div>
   );
 };
+
+const InfoCard = ({ icon, label, value, color }: { icon: React.ReactNode, label: string, value: string, color: string }) => (
+  <div className="group bg-gray-50 hover:bg-white hover:shadow-md hover:border-blue-100 border border-transparent p-5 rounded-2xl transition-all duration-300">
+    <div className={`${color} mb-3 group-hover:scale-110 transition-transform duration-300`}>
+      {icon}
+    </div>
+    <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">{label}</p>
+    <p className="text-sm font-bold text-[#1A2E44] break-words">{value}</p>
+  </div>
+);
 
 export default DoctorProfile;

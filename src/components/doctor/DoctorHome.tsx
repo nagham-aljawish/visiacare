@@ -1,5 +1,4 @@
 import React from "react";
-import DoctorNavbar from "../sharedFile/DoctorNavbar";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 
@@ -8,9 +7,7 @@ const DoctorHome: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-[#E9F2FA] flex flex-col">
-      <DoctorNavbar />
-
-      <div className="flex flex-col lg:flex-row items-center justify-center flex-1 px-6 lg:px-20 gap-16 pt-20 lg:pt-28">
+      <div className="flex flex-col lg:flex-row items-center justify-center flex-1 px-6 lg:px-20 gap-16">
         <motion.img
           initial={{ opacity: 0, x: 40 }}
           animate={{ opacity: 1, x: 0 }}

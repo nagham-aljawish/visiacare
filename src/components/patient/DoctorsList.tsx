@@ -19,6 +19,8 @@ interface Doctor {
 }
 
 const DoctorsList: React.FC = () => {
+  const [currentPage, setCurrentPage] = useState(1);
+  const [lastPage, setLastPage] = useState(1);
   const [doctors, setDoctors] = useState<Doctor[]>([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
@@ -26,33 +28,36 @@ const DoctorsList: React.FC = () => {
   const token = localStorage.getItem("token");
 
   useEffect(() => {
-    const fetchDoctors = async () => {
-      setLoading(true);
-      try {
-        const response = await fetch(
-          "http://127.0.0.1:8000/api/doctor/approved",
-          {
-            headers: {
-              "Content-Type": "application/json",
-              ...(token && { Authorization: `Bearer ${token}` }),
-            },
-          }
-        );
-        const data = await response.json();
-        console.log("Fetched doctors:", data);
-
-        if (data.status === "success") {
-          setDoctors(data.data.doctors);
+  const fetchDoctors = async () => {
+    setLoading(true);
+    try {
+      const response = await fetch(
+        `http://127.0.0.1:8000/api/doctor/approved?page=${currentPage}`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            ...(token && { Authorization: `Bearer ${token}` }),
+          },
         }
-      } catch (err) {
-        console.error("Error fetching doctors:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
+      );
 
-    fetchDoctors();
-  }, [token]);
+      const data = await response.json();
+
+      if (data.status === "success") {
+        setDoctors(data.data.doctors);
+        setCurrentPage(data.data.pagination.current_page);
+        setLastPage(data.data.pagination.last_page);
+      }
+    } catch (err) {
+      console.error("Error fetching doctors:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  fetchDoctors();
+}, [token, currentPage]);
+
 
   if (loading) {
     return (
@@ -69,7 +74,7 @@ const DoctorsList: React.FC = () => {
         Available Doctors
       </h1>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10 px-6 max-w-6xl mx-auto pb-16">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10 px-6 max-w-6xl mx-auto pb-10">
         {doctors.map((doctor) => (
           <motion.div
             key={doctor.id}
@@ -104,20 +109,46 @@ const DoctorsList: React.FC = () => {
             <div className="flex justify-center mt-5">
               <button
                 onClick={() => {
-                  console.log(
-                    "Navigating to doctor_profile_id:",
-                    doctor.doctor_profile_id
-                  );
                   navigate(`/doctor-details/${doctor.doctor_profile_id}`);
                 }}
                 className="px-5 py-2 bg-[#1A2E44] text-white rounded-full"
               >
-                View Profile
+                Make an Appoiments
               </button>
             </div>
           </motion.div>
         ))}
       </div>
+      <div className="flex justify-center items-center gap-4 mt-10 pb-10">
+          <button
+            disabled={currentPage === 1}
+            onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+            className={`px-4 py-2 rounded-full transition ${
+              currentPage === 1
+                ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                : "bg-[#1A2E44] text-white hover:bg-[#16283b]"
+            }`}
+          >
+            Previous
+          </button>
+
+          <span className="text-[#1A2E44] font-medium">
+            Page {currentPage} of {lastPage}
+          </span>
+
+          <button
+            disabled={currentPage === lastPage}
+            onClick={() => setCurrentPage((p) => Math.min(lastPage, p + 1))}
+            className={`px-4 py-2 rounded-full transition ${
+              currentPage === lastPage
+                ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                : "bg-[#1A2E44] text-white hover:bg-[#16283b]"
+            }`}
+          >
+            Next
+          </button>
+        </div> 
+
     </div>
   );
 };

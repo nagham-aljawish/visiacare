@@ -11,7 +11,6 @@ const Home: React.FC = () => {
       <PatientNavbar />
 
       <div className="flex flex-col lg:flex-row items-center justify-center flex-1 px-6 lg:px-20 gap-16 pt-20 lg:pt-28">
-        {/* صورة المريض أو أي صورة مرحبة */}
         <motion.img
           initial={{ opacity: 0, x: 40 }}
           animate={{ opacity: 1, x: 0 }}
@@ -21,7 +20,6 @@ const Home: React.FC = () => {
           className="w-[280px] sm:w-[340px] lg:w-[460px] drop-shadow-2xl order-2 lg:order-1"
         />
 
-        {/* بطاقة الترحيب */}
         <motion.div
           initial={{ opacity: 0, x: -40 }}
           animate={{ opacity: 1, x: 0 }}

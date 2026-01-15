@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
 interface Availability {
   id: number;
@@ -11,6 +12,7 @@ interface Availability {
 }
 
 const BookAppointment: React.FC = () => {
+  const navigate = useNavigate()
   const location = useLocation();
   const { availability, selectedDay } = location.state as {
     availability: Availability;
@@ -23,10 +25,11 @@ const BookAppointment: React.FC = () => {
   const [appointmentTime, setAppointmentTime] = useState<string>("");
   const [loading, setLoading] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+const handleSubmit = async (e: React.FormEvent) => {
   e.preventDefault();
 
   if (!appointmentDate || !appointmentTime) {
+    toast.warning("Please select the date and time");
     return;
   }
 
@@ -36,27 +39,47 @@ const BookAppointment: React.FC = () => {
     const res = await fetch("http://127.0.0.1:8000/api/appointments/book", {
       method: "POST",
       headers: {
-        "Accept": "application/json",
+        Accept: "application/json",
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify({
-        availability_id:availability.doctor_availabilities_id,
+        availability_id: availability.doctor_availabilities_id,
         appointment_date: appointmentDate,
         appointment_time: appointmentTime,
       }),
     });
 
-
-
     const data = await res.json();
-    console.log("Appointment booked:", data);
+
+    if (!res.ok) {
+      if (data.errors) {
+      Object.values(data.errors as Record<string, string[]>).forEach(
+        (messages) => {
+          messages.forEach((msg) => {
+            toast.error(msg);
+          });
+        }
+      );
+      return;
+    }
+    else if (data.message) {
+      toast.error(data.message);
+    }
+    
+    return;
+  }
+  
+    navigate("/patient-appointments");
+    toast.success("The appointment was booked successfully.");
+
   } catch (err) {
-    console.error("Error booking appointment:", err);
+    console.error(err);
   } finally {
     setLoading(false);
   }
 };
+
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#0f172a] to-[#1e293b] flex items-center justify-center p-6">

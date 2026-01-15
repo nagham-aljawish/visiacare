@@ -2,17 +2,17 @@ import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 
 interface Availability {
-  id: number;
   day_in_week: string;
   start_time: string;
   end_time: string;
-  doctor_id: number;
+  doctor_name: string;
+  location: string;
 }
 
 interface Doctor {
   id: number;
-  name: string;
-  availabilities?: Availability[];
+  doctor_name: string;
+  availabilities: Availability[];
 }
 
 const DoctorDetails: React.FC = () => {
@@ -42,7 +42,7 @@ const DoctorDetails: React.FC = () => {
         if (data.status === "success") {
           setDoctor({
             id: parseInt(doctorId),
-            name: `Dr.${doctorId}`,
+            doctor_name: data.data[0].doctor_name,
             availabilities: data.data,
           });
         }
@@ -68,7 +68,7 @@ const DoctorDetails: React.FC = () => {
       <div className="max-w-3xl mx-auto mt-6 bg-[#1e293b]/70 backdrop-blur-xl border border-white/10 rounded-2xl p-6 shadow-xl">
         <h2 className="text-2xl font-semibold text-white mb-4 flex items-center gap-2">
           <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse"></span>
-          Available Times for {doctor.name}
+          Available Times for {doctor.doctor_name}
         </h2>
 
         {doctor.availabilities && doctor.availabilities.length > 0 ? (

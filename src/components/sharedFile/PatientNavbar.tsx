@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Bell, Settings, Menu, X } from "lucide-react";
+import { Bell, Menu, X, LogOut, User } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 import EyeLogo from "/src/assets/eye-svgrepo-com.svg";
 
@@ -10,18 +10,37 @@ const PatientNavbar: React.FC = () => {
 
   const isActive = (path: string) => location.pathname === path;
 
+  const handleLogout = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      await fetch("http://127.0.0.1:8000/api/auth/logout", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+    } catch (err) {
+      console.error("Logout error:", err);
+    } finally {
+      localStorage.removeItem("token");
+      localStorage.removeItem("role");
+      localStorage.removeItem("user_id");
+      navigate("/");
+    }
+  };
+
   const navLinks = [
     { label: "Home", path: "/patient-home" },
     { label: "Doctors", path: "/patient-doctors" },
     { label: "Appointments", path: "/patient-appointments" },
     { label: "Prescriptions", path: "/patient-prescriptions" },
     { label: "Optical Shops", path: "/patient-optical-shops" },
-    { label: "Profile", path: "/patient-profile" },
+    { label: "Orders", path: "/patient-orders" },
   ];
 
   return (
     <nav className="w-full flex justify-between items-center px-4 sm:px-8 py-4 bg-[#1A2E44] shadow-md fixed top-0 z-50">
-      {/* Logo */}
       <div
         className="flex items-center gap-2 cursor-pointer"
         onClick={() => navigate("/patient-home")}
@@ -38,7 +57,6 @@ const PatientNavbar: React.FC = () => {
         <h1 className="text-2xl font-semibold text-white">VisiaCare</h1>
       </div>
 
-      {/* Desktop Navigation */}
       <div className="hidden md:flex items-center justify-center bg-white px-8 py-2 rounded-full shadow-sm gap-8">
         {navLinks.map((link) => (
           <button
@@ -55,33 +73,28 @@ const PatientNavbar: React.FC = () => {
         ))}
       </div>
 
-      {/* Right Icons (Desktop) */}
       <div className="hidden md:flex items-center gap-5">
         <button
-          className="relative"
+          className="relative text-white hover:text-gray-300 transition"
           onClick={() => navigate("/patient-notifications")}
         >
-          <Bell className="text-white" size={22} />
-          <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] w-4 h-4 flex items-center justify-center rounded-full">
-            3
-          </span>
+          <Bell size={22} />
         </button>
-
-        <button onClick={() => navigate("/patient-settings")}>
-          <Settings className="text-white" size={22} />
+        <button
+          className={`relative text-white hover:text-gray-300 transition ${isActive("/patient-profile") ? "text-blue-400" : ""}`}
+          onClick={() => navigate("/patient-profile")}
+        >
+          <User size={24} />
         </button>
-
-        <div className="relative">
-          <img
-            src="/images/patientPhoto.jpg"
-            alt="Patient Avatar"
-            className="w-10 h-10 rounded-full border-2 border-white object-cover"
-          />
-          <span className="absolute top-0 right-0 w-3 h-3 bg-green-500 rounded-full border-[2px] border-white shadow-sm"></span>
-        </div>
+        <button
+          onClick={handleLogout}
+          className="flex items-center gap-2 bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-full text-sm font-bold transition shadow-sm"
+        >
+          <LogOut size={18} />
+          Logout
+        </button>
       </div>
 
-      {/* Mobile Menu Button */}
       <div className="md:hidden flex items-center">
         <button onClick={() => setMenuOpen(!menuOpen)}>
           {menuOpen ? (
@@ -92,9 +105,8 @@ const PatientNavbar: React.FC = () => {
         </button>
       </div>
 
-      {/* Mobile Dropdown Menu */}
       {menuOpen && (
-        <div className="md:hidden bg-white text-[#1A2E44] w-full flex flex-col items-center gap-4 py-4 mt-4 rounded-xl shadow-lg">
+        <div className="absolute top-16 left-0 w-full bg-white text-[#1A2E44] flex flex-col items-center gap-4 py-6 shadow-xl z-40 border-t border-gray-100">
           {navLinks.map((link) => (
             <button
               key={link.path}
@@ -102,8 +114,8 @@ const PatientNavbar: React.FC = () => {
                 navigate(link.path);
                 setMenuOpen(false);
               }}
-              className={`font-semibold transition ${
-                isActive(link.path) ? "underline" : "hover:text-gray-600"
+              className={`font-semibold text-lg transition ${
+                isActive(link.path) ? "text-blue-600" : "hover:text-gray-600"
               }`}
             >
               {link.label}
@@ -115,22 +127,19 @@ const PatientNavbar: React.FC = () => {
               navigate("/patient-notifications");
               setMenuOpen(false);
             }}
-            className="relative font-semibold"
+            className="font-semibold text-lg"
           >
             Notifications
-            <span className="absolute -top-1 -right-3 bg-red-500 text-white text-[10px] w-4 h-4 flex items-center justify-center rounded-full">
-              3
-            </span>
           </button>
 
+          <hr className="w-4/5 border-gray-200" />
+
           <button
-            onClick={() => {
-              navigate("/patient-settings");
-              setMenuOpen(false);
-            }}
-            className="font-semibold"
+            onClick={handleLogout}
+            className="flex items-center gap-2 text-red-600 font-bold text-lg"
           >
-            Settings
+            <LogOut size={20} />
+            Logout
           </button>
         </div>
       )}

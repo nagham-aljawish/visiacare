@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { motion } from "framer-motion";
 import EyeLogo from "/src/assets/eye-svgrepo-com.svg";
 import { Eye, EyeOff } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const PatientRegister: React.FC = () => {
   const [name, setName] = useState("");
@@ -13,15 +14,18 @@ const PatientRegister: React.FC = () => {
   const [chronic_conditions, setChronicConditions] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string[]>>({});
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
+
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
     setSuccess("");
+    setFieldErrors({});
     setLoading(true);
 
     if (
@@ -61,11 +65,20 @@ const PatientRegister: React.FC = () => {
       setLoading(false);
 
       if (!response.ok) {
-        setError(data.message || "Something went wrong. Try again.");
+        if (data.errors) {
+          setFieldErrors(data.errors);
+        } else {
+          setError(data.message || "Something went wrong");
+        }
         return;
       }
+      localStorage.setItem("token", data.token);
+      localStorage.setItem("user_id", data.data.id.toString());
+      const role = data.data.role ? data.data.role.toLowerCase() : "patient";
+      localStorage.setItem("my_role", role);
+      localStorage.setItem("patient_profile_id",data.data.patient_profile_id.toString());
 
-      // ✔️ مافي موافقة أدمن — الحساب جاهز فورًا
+      navigate("/patient-home");
       setSuccess(
         "Your account has been created successfully! You can now log in."
       );
@@ -100,7 +113,6 @@ const PatientRegister: React.FC = () => {
         transition={{ duration: 0.6, ease: "easeOut" }}
         className="relative z-10 w-[420px] bg-[#CCDCE9]/40 backdrop-blur-md p-8 rounded-2xl shadow-2xl border border-white/30"
       >
-        {/* Header */}
         <div className="text-center mb-8">
           <div className="flex justify-center items-center gap-2 mb-2">
             <img
@@ -117,8 +129,12 @@ const PatientRegister: React.FC = () => {
           <p className="text-[#1A2E44]/80 text-sm">Patient Registration Form</p>
         </div>
 
-        {/* Form */}
         <form onSubmit={handleSubmit} className="flex flex-col space-y-3.5">
+          {fieldErrors.name && (
+            <p className="text-red-600 text-xs mt-1">
+              {fieldErrors.name[0]}
+            </p>
+          )}
           <input
             type="text"
             placeholder="Full name"
@@ -126,7 +142,11 @@ const PatientRegister: React.FC = () => {
             onChange={(e) => setName(e.target.value)}
             className="w-full px-3 py-2.5 text-[14px] rounded-lg bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-300"
           />
-
+          {fieldErrors.email && (
+            <p className="text-red-600 text-xs mt-1">
+              {fieldErrors.email[0]}
+            </p>
+          )}
           <input
             type="email"
             placeholder="Email address"
@@ -134,7 +154,11 @@ const PatientRegister: React.FC = () => {
             onChange={(e) => setEmail(e.target.value)}
             className="w-full px-3 py-2.5 text-[14px] rounded-lg bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-300"
           />
-
+          {fieldErrors.national_number && (
+            <p className="text-red-600 text-xs mt-1">
+              {fieldErrors.national_number[0]}
+            </p>
+          )}
           <input
             type="text"
             placeholder="National ID"
@@ -143,6 +167,12 @@ const PatientRegister: React.FC = () => {
             className="w-full px-3 py-2.5 text-[14px] rounded-lg bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-300"
           />
 
+          {fieldErrors.phone_number && (
+            <p className="text-red-600 text-xs mt-1">
+              {fieldErrors.phone_number[0]}
+            </p>
+          )}
+
           <input
             type="tel"
             placeholder="+963 xxx xxx xxx"
@@ -150,6 +180,12 @@ const PatientRegister: React.FC = () => {
             onChange={(e) => setPhoneNumber(e.target.value)}
             className="w-full px-3 py-2.5 text-[14px] rounded-lg bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-300"
           />
+
+          {fieldErrors.gender && (
+            <p className="text-red-600 text-xs mt-1">
+              {fieldErrors.gender[0]}
+            </p>
+          )}
 
           <select
             value={gender}
@@ -160,6 +196,12 @@ const PatientRegister: React.FC = () => {
             <option value="male">Male</option>
             <option value="female">Female</option>
           </select>
+
+          {fieldErrors.location && (
+            <p className="text-red-600 text-xs mt-1">
+              {fieldErrors.location[0]}
+            </p>
+          )}
 
           <input
             type="text"
@@ -176,7 +218,12 @@ const PatientRegister: React.FC = () => {
             className="w-full px-3 py-2.5 text-[14px] rounded-lg bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-300 resize-none"
           />
 
-          {/* Password */}
+          {fieldErrors.password && (
+            <p className="text-red-600 text-xs mt-1">
+              {fieldErrors.password[0]}
+            </p>
+          )}
+
           <div className="relative">
             <input
               type={showPassword ? "text" : "password"}
@@ -216,7 +263,7 @@ const PatientRegister: React.FC = () => {
           <p className="text-center text-[#1A2E44]/80 text-sm mt-2">
             Already have an account?{" "}
             <a
-              href="/patient-login"
+              href="/"
               className="underline font-medium hover:text-[#1A2E44]"
             >
               Login here
