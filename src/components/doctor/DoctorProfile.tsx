@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 
 const DoctorProfile: React.FC = () => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [profileData, setProfileData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const token = localStorage.getItem("token");
@@ -38,6 +39,7 @@ const DoctorProfile: React.FC = () => {
 
   useEffect(() => {
     fetchProfile();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (

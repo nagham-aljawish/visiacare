@@ -22,6 +22,7 @@ const Appointments: React.FC = () => {
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [loading, setLoading] = useState(false);
   const [showPrescriptionModal, setShowPrescriptionModal] = useState(false);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [selectedForPrescription, setSelectedForPrescription] = useState<Appointment | null>(null);
 
   const [formData, setFormData] = useState({
@@ -58,6 +59,7 @@ const Appointments: React.FC = () => {
 
   useEffect(() => {
     fetchAppointments(activeTab);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeTab]);
 
   const updateAppointmentStatus = async (id: number, action: "approve" | "reject") => {

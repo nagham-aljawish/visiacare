@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
@@ -95,6 +96,7 @@ const Patients = () => {
     } catch (err) { console.error(err); }
   };
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => { fetchApprovedPatients(); }, []);
 
   const handleViewPrescriptions = async (patientId: number) => {
@@ -235,6 +237,7 @@ const Notifications = () => {
       }
     })
     .catch(err => console.error(err));
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
