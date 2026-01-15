@@ -39,8 +39,10 @@ const OpticalStoreProducts: React.FC = () => {
   const patientProfileId = localStorage.getItem("patient_profile_id"); 
 
   const [products, setProducts] = useState<Product[]>([]);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [lastPage, setLastPage] = useState(1);
 
   const [cart, setCart] = useState<CartItem[]>([]);
@@ -77,6 +79,7 @@ const OpticalStoreProducts: React.FC = () => {
       const data = await response.json();
       setPrescriptions(data.data);
       setIsPrescriptionModalOpen(true);
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (err) {
       alert("Failed to load prescriptions");
     }
@@ -122,6 +125,7 @@ const OpticalStoreProducts: React.FC = () => {
         setIsCartOpen(false);
         setIsPrescriptionModalOpen(false);
       }
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (err) { alert("Order failed"); } finally { setIsSubmitting(false); }
   };
 

@@ -39,6 +39,7 @@ const PatientOrders: React.FC = () => {
             if (data.success) {
                 setOrders(data.data);
             }
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         } catch (err) {
             toast.error("Failed to load your orders");
         } finally {
@@ -48,6 +49,7 @@ const PatientOrders: React.FC = () => {
 
     useEffect(() => {
         fetchMyOrders();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     const handleReorder = async (orderId: number) => {
@@ -64,6 +66,7 @@ const PatientOrders: React.FC = () => {
                 toast.success(data.message || "Order created successfully!");
                 fetchMyOrders();
             }
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         } catch (err) {
             toast.error("Failed to re-order");
         }

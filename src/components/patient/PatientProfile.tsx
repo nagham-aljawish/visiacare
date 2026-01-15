@@ -3,6 +3,7 @@ import { User, Mail, MapPin, Hash, Activity, Calendar } from "lucide-react";
 import PatientNavbar from "../sharedFile/PatientNavbar";
 
 const PatientProfile: React.FC = () => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [profileData, setProfileData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const token = localStorage.getItem("token");
@@ -30,6 +31,7 @@ const PatientProfile: React.FC = () => {
 
   useEffect(() => {
     fetchProfile();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (

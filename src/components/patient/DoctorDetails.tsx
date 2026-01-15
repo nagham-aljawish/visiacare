@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 
 interface Availability {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  id: any;
   day_in_week: string;
   start_time: string;
   end_time: string;

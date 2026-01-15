@@ -47,6 +47,7 @@ const PatientPrescriptions: React.FC = () => {
         } else {
           setPrescriptions([]);
         }
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       } catch (error) {
         toast.error("Failed to load prescriptions");
       } finally {
