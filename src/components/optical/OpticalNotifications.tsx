@@ -3,6 +3,7 @@ import { Bell, Calendar, Info } from "lucide-react";
 import OpticalShopNavbar from "../sharedFile/OpticalShopNavbar";
 
 const OpticalNotifications: React.FC = () => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [notifications, setNotifications] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const token = localStorage.getItem("token");
@@ -30,6 +31,7 @@ const OpticalNotifications: React.FC = () => {
 
   useEffect(() => {
     fetchNotifications();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (

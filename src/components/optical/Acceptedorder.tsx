@@ -49,6 +49,7 @@ const StoreOrders: React.FC = () => {
 
     useEffect(() => {
         fetchOrders();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     const markAsReady = async (orderId: number) => {
@@ -62,6 +63,7 @@ const StoreOrders: React.FC = () => {
                 toast.success("Order marked as ready!");
                 fetchOrders();
             }
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         } catch (err) {
             toast.error("Failed to update order status");
         }

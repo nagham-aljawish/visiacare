@@ -47,6 +47,7 @@ const StoreOrders: React.FC = () => {
 
   useEffect(() => {
     fetchOrders();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const fetchOrders = async () => {
@@ -59,6 +60,7 @@ const StoreOrders: React.FC = () => {
       if (data.success) {
         setOrders(data.data);
       }
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (err) {
       toast.error("Failed to load orders");
     } finally {
@@ -77,6 +79,7 @@ const StoreOrders: React.FC = () => {
         toast.success(`Order ${action}ed successfully`);
         fetchOrders();
       }
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (err) {
       toast.error("Action failed");
     }

@@ -3,6 +3,7 @@ import { User, Store, MapPin, Clock, Mail, FileText } from "lucide-react";
 import OpticalShopNavbar from "../sharedFile/OpticalShopNavbar";
 
 const OpticalProfile: React.FC = () => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [profileData, setProfileData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const token = localStorage.getItem("token");
@@ -30,6 +31,7 @@ const OpticalProfile: React.FC = () => {
 
   useEffect(() => {
     fetchProfile();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (

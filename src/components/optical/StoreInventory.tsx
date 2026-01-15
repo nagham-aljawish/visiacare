@@ -36,6 +36,7 @@ const StoreOrders: React.FC = () => {
             });
             const result = await res.json();
             if (result.success) setProducts(result.data);
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         } catch (err) {
             toast.error("Failed to load products");
         } finally {
@@ -43,6 +44,7 @@ const StoreOrders: React.FC = () => {
         }
     };
 
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     useEffect(() => { fetchProducts(); }, []);
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -72,6 +74,7 @@ const StoreOrders: React.FC = () => {
                 resetForm();
                 fetchProducts();
             }
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         } catch (err) {
             toast.error("Operation failed");
         }
@@ -89,6 +92,7 @@ const StoreOrders: React.FC = () => {
                 toast.success("Product deleted");
                 fetchProducts();
             }
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         } catch (err) {
             toast.error("Delete failed");
         }
